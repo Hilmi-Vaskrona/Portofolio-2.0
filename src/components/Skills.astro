@@ -1,0 +1,45 @@
+---
+const deviconBase = 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons';
+
+const skills = [
+  { name: 'HTML', level: 90, color: '#e34c26', icon: `${deviconBase}/html5/html5-plain.svg` },
+  { name: 'CSS', level: 85, color: '#264de4', icon: `${deviconBase}/css3/css3-plain.svg` },
+  { name: 'JavaScript', level: 55, color: '#f7df1e', icon: `${deviconBase}/javascript/javascript-plain.svg` },
+  { name: 'Tailwind', level: 90, color: '#38bdf8', icon: `${deviconBase}/tailwindcss/tailwindcss-original.svg` },
+  { name: 'Figma', level: 75, color: '#f24e1e', icon: `${deviconBase}/figma/figma-original.svg` },
+  { name: 'Laravel', level: 35, color: '#ff2d20', icon: `${deviconBase}/laravel/laravel-original.svg` },
+  { name: 'Python', level: 4, color: '#3776ab', icon: `${deviconBase}/python/python-plain.svg` },
+  { name: 'Framer', level: 47, color: '#bb4bff', icon: 'https://cdn.simpleicons.org/framer/BB4BFF' },
+  { name: 'React', level: 1, color: '#61dafb', icon: `${deviconBase}/react/react-original.svg` },
+  { name: 'Canva', level: 55, color: '#00c4cc', icon: `${deviconBase}/canva/canva-original.svg` },
+];
+---
+
+<section id="skills" class="py-24 px-6 lg:px-[10%] relative">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-6">
+      {skills.map((skill) => (
+        <div class="skill-card group relative p-6 rounded-2xl border border-[#262626] bg-[#111111]/80 hover:border-[#a3a3a3]/40 hover:bg-[#1a1a1a] transition-all duration-500 cursor-default reveal"
+             style={`--card-accent: ${skill.color}`}>
+          <div class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-[#a3a3a3]/5 to-transparent"></div>
+
+          <div class="relative flex flex-col items-center gap-3">
+            <div class="relative w-20 h-20">
+              <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#262626" stroke-width="3" />
+                <circle cx="18" cy="18" r="15.9155" fill="none" stroke={skill.color} stroke-width="3"
+                  stroke-dasharray={`${skill.level}, 100`}
+                  class="transition-all duration-1000 group-hover:stroke-[#a3a3a3]" />
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <img src={skill.icon} alt={skill.name} loading="lazy" class="w-8 h-8 object-contain" />
+              </div>
+            </div>
+            <span class="text-sm font-bold text-[#e5e5e5] group-hover:text-[#d4d4d4] transition-colors">{skill.level}%</span>
+            <span class="text-sm font-semibold text-[#a3a3a3] group-hover:text-[#e5e5e5] transition-colors">{skill.name}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

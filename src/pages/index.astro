@@ -1,11 +1,160 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import LoadingScreen from '../components/LoadingScreen.astro';
+import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Experience from '../components/Experience.astro';
+import Portfolio from '../components/Portfolio.astro';
+import Sertifikat from '../components/Sertifikat.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="CV Hilmi Zaki R">
+  <LoadingScreen />
+  <div id="main-content" style="opacity: 0;">
+    <Navbar />
+    <Hero />
+    <About />
+    <Experience />
+    <Portfolio />
+    <Sertifikat />
+
+    <Contact />
+    <Footer />
+  </div>
+
+  <script>
+    import Lenis from 'lenis';
+    import { animate } from 'animejs';
+
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: function(t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+      smoothWheel: true,
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    var mainContent = document.getElementById('main-content');
+    var loadingScreen = document.getElementById('loading-screen');
+    var progressBar = document.getElementById('loading-progress');
+    var loadingPercent = document.getElementById('loading-percent');
+    var logo = document.getElementById('loading-logo');
+    var dissolveGrid = document.getElementById('dissolve-grid');
+
+    var progress = 0;
+    var interval = setInterval(function() {
+      progress += Math.random() * 15 + 5;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(interval);
+        setTimeout(function() { startExitAnimation(); }, 400);
+      }
+      if (progressBar) progressBar.style.width = progress + '%';
+      if (loadingPercent) loadingPercent.textContent = Math.floor(progress) + '%';
+    }, 150);
+
+    function createDissolveGrid() {
+      if (!dissolveGrid) return;
+      var gridCols = 16;
+      var gridRows = 9;
+      dissolveGrid.style.gridTemplateColumns = 'repeat(' + gridCols + ', 1fr)';
+      dissolveGrid.style.gridTemplateRows = 'repeat(' + gridRows + ', 1fr)';
+
+      for (var i = 0; i < gridCols * gridRows; i++) {
+        var tile = document.createElement('div');
+        tile.className = 'dissolve-tile';
+        dissolveGrid.appendChild(tile);
+      }
+    }
+
+    function startExitAnimation() {
+      if (!loadingScreen) return;
+
+      var cols = 16;
+      var rows = 9;
+
+      // Phase 1: Glitch (0 - 600ms)
+      loadingScreen.classList.add('glitching');
+
+      // Phase 2: Dissolve (600ms - 1400ms)
+      setTimeout(function() {
+        createDissolveGrid();
+        var tiles = document.querySelectorAll('.dissolve-tile');
+        var totalTiles = tiles.length;
+
+        // Make loading screen background transparent so tiles are visible
+        loadingScreen.style.background = 'transparent';
+
+        // Hide logo
+        if (logo) {
+          animate(logo, {
+            opacity: [1, 0],
+            scale: [1, 0.8],
+            duration: 200,
+            easing: 'easeOutQuad',
+          });
+        }
+
+        // Animate each tile: appear then dissolve
+        tiles.forEach(function(tile, i) {
+          var row = Math.floor(i / cols);
+          var col = i % cols;
+          var centerDist = Math.sqrt(
+            Math.pow(col - cols / 2, 2) + Math.pow(row - rows / 2, 2)
+          );
+          var maxDist = Math.sqrt(Math.pow(cols / 2, 2) + Math.pow(rows / 2, 2));
+          var normalizedDist = centerDist / maxDist;
+
+          // Random delay based on distance from center + randomness
+          var delay = normalizedDist * 300 + Math.random() * 200;
+          var randomX = (Math.random() - 0.5) * 200;
+          var randomY = (Math.random() - 0.5) * 200;
+          var randomRotate = (Math.random() - 0.5) * 90;
+
+          animate(tile, {
+            opacity: [0, 1, 1, 0],
+            translateX: [0, 0, randomX],
+            translateY: [0, 0, randomY],
+            rotate: [0, 0, randomRotate],
+            scale: [0.5, 1, 0.3],
+            duration: 800,
+            delay: delay,
+            easing: 'easeOutCubic',
+          });
+        });
+
+        // Phase 3: Reveal content (after dissolve)
+        setTimeout(function() {
+          if (loadingScreen) loadingScreen.style.display = 'none';
+          if (mainContent) {
+            mainContent.style.opacity = '1';
+            mainContent.style.transition = 'opacity 0.6s ease';
+          }
+          initScrollAnimations();
+        }, 900);
+      }, 600);
+    }
+
+    function initScrollAnimations() {
+      var reveals = document.querySelectorAll('.reveal');
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          }
+        });
+      }, { threshold: 0.15 });
+
+      reveals.forEach(function(el) { observer.observe(el); });
+    }
+  </script>
 </Layout>

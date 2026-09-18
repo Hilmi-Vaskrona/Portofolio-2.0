@@ -1,46 +1,55 @@
-# Astro Starter Kit: Basics
+# Portofolio 2.0 — Hilmi Zaki R
 
-```sh
-npm create astro@latest -- --template basics
-```
+Personal portfolio website milik **Hilmi Zaki R** — siswa SMK Madinatul Quran jurusan Rekayasa Perangkat Lunak (RPL). Menampilkan profil, pengalaman proyek, portofolio web & desain, sertifikat, dan formulir kontak.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## 🚀 Tech Stack
 
-## 🚀 Project Structure
+| Kategori | Teknologi |
+|---|---|
+| Framework | [Astro](https://astro.build) |
+| CSS | Tailwind CSS v4 |
+| Animasi | [anime.js](https://animejs.com) |
+| Smooth Scroll | [Lenis](https://github.com/darkroomengineering/lenis) |
+| Font | Inter + JetBrains Mono |
+| Form Kontak | Formspree |
 
-Inside of your Astro project, you'll see the following folders and files:
+## 🎨 Desain
+
+Dark monochrome (hitam/abu/putih), glassmorphism, glow effects, glitch & dissolve loading screen, scanline CRT overlay, scroll reveal animations.
+
+## 📂 Struktur
 
 ```text
 /
 ├── public/
-│   └── favicon.svg
+│   ├── logo_vaskrona.png
+│   ├── favicon.svg
+│   └── sertifikat/
 ├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
+│   ├── components/
+│   │   ├── LoadingScreen.astro
+│   │   ├── Navbar.astro
+│   │   ├── Hero.astro
+│   │   ├── About.astro
+│   │   ├── Experience.astro
+│   │   ├── Portfolio.astro
+│   │   ├── Sertifikat.astro
+│   │   ├── Contact.astro
+│   │   └── Footer.astro
+│   ├── layouts/
+│   │   └── Layout.astro
+│   ├── pages/
+│   │   └── index.astro
+│   └── styles/
+│       └── global.css
 └── package.json
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
-
 ## 🧞 Commands
 
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+| Command | Aksi |
+|---|---|
+| `npm run dev` | Mulai dev server di `localhost:4321` |
+| `npm run build` | Build production ke `./dist/` |
+| `npm run preview` | Preview hasil build |
+| `npm run astro check` | Cek error TypeScript |

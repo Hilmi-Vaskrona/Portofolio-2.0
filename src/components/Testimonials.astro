@@ -1,0 +1,47 @@
+---
+const testimonials = [
+  {
+    quote: 'Hilmi memiliki kemampuan desain yang luar biasa. Setiap project yang dia kerjakan selalu memiliki sentuhan kreatif yang berbeda.',
+    name: 'Ahmad Fauzi',
+    role: 'Teman Sekolah',
+  },
+  {
+    quote: 'Bekerja dengan Hilmi selalu menyenangkan. Dia cepat belajar hal baru dan selalu berusaha memberikan yang terbaik.',
+    name: 'Rina Sari',
+    role: 'Guru RPL',
+  },
+  {
+    quote: 'Hilmi mampu mengubah ide sederhana menjadi sesuatu yang luar biasa. Potensinya sebagai developer sangat besar.',
+    name: 'Budi Santoso',
+    role: 'Mentor',
+  },
+];
+---
+
+<section id="testimonials" class="py-24 px-6 lg:px-[10%] relative">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <p class="text-sm font-mono text-[#a3a3a3] tracking-[0.3em] uppercase mb-3">What Others Say</p>
+      <h2 class="text-5xl lg:text-6xl font-black text-[#e5e5e5]">Testi<span class="text-[#a3a3a3]">monials</span></h2>
+      <div class="w-20 h-1 bg-[#a3a3a3] mx-auto mt-6 rounded-full shadow-[0_0_15px_#a3a3a366]"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {testimonials.map((t) => (
+        <div class="group relative p-8 rounded-2xl border border-[#262626] bg-[#111111]/80 hover:border-[#a3a3a3]/30 hover:shadow-[0_0_30px_#a3a3a311] transition-all duration-500 reveal">
+          <div class="text-4xl text-[#a3a3a3]/20 font-serif mb-4">"</div>
+          <p class="text-[#a3a3a3] text-sm leading-relaxed italic mb-6">{t.quote}</p>
+          <div class="flex items-center gap-3 pt-4 border-t border-[#262626]">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#a3a3a3]/30 to-[#a3a3a3]/10 flex items-center justify-center text-sm font-bold text-[#a3a3a3]">
+              {t.name.charAt(0)}
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-[#e5e5e5]">{t.name}</p>
+              <p class="text-xs text-[#525252]">{t.role}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

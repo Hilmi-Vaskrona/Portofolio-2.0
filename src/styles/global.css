@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0a0a0a;
+  --color-bg-alt: #111111;
+  --color-bg-card: #1a1a1a;
+  --color-accent: #a3a3a3;
+  --color-accent-hover: #d4d4d4;
+  --color-accent-glow: #a3a3a366;
+  --color-text: #e5e5e5;
+  --color-text-muted: #a3a3a3;
+  --color-text-dim: #525252;
+  --color-border: #262626;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent) var(--color-bg);
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: #0a0a0a;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 3px;
+}
+
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  pointer-events: none;
+}
+
+/* Scanline Overlay */
+.scanline-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(163, 163, 163, 0.03) 2px,
+    rgba(163, 163, 163, 0.03) 4px
+  );
+}
+
+/* Glitch Text Effect */
+@keyframes glitchText {
+  0%, 100% { text-shadow: none; transform: translate(0); }
+  10% { text-shadow: -3px 0 #ff0040, 3px 0 #00fff9; transform: translate(-2px, 1px); }
+  20% { text-shadow: 3px 0 #ff0040, -3px 0 #00fff9; transform: translate(2px, -1px); }
+  30% { text-shadow: none; transform: translate(0); }
+  40% { text-shadow: -2px 0 #ff0040, 2px 0 #00fff9; transform: translate(1px, 2px); }
+  50% { text-shadow: 2px 0 #ff0040, -2px 0 #00fff9; transform: translate(-1px, -2px); }
+  60% { text-shadow: none; transform: translate(0); }
+  70% { text-shadow: -4px 0 #ff0040, 4px 0 #00fff9; transform: translate(3px, 0); }
+  80% { text-shadow: 4px 0 #ff0040, -4px 0 #00fff9; transform: translate(-3px, 0); }
+  90% { text-shadow: none; transform: translate(0); }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  5% { opacity: 0.3; }
+  10% { opacity: 1; }
+  15% { opacity: 0.6; }
+  20% { opacity: 1; }
+  50% { opacity: 0.8; }
+  55% { opacity: 1; }
+  80% { opacity: 0.4; }
+  85% { opacity: 1; }
+}
+
+@keyframes glitchSlice {
+  0%, 100% { clip-path: inset(0 0 100% 0); opacity: 0; }
+  10% { clip-path: inset(20% 0 60% 0); opacity: 1; transform: translate(-8px, 0); }
+  20% { clip-path: inset(50% 0 30% 0); opacity: 1; transform: translate(8px, 0); }
+  30% { clip-path: inset(10% 0 70% 0); opacity: 1; transform: translate(-4px, 0); }
+  40% { clip-path: inset(80% 0 5% 0); opacity: 1; transform: translate(4px, 0); }
+  50% { clip-path: inset(0 0 100% 0); opacity: 0; }
+}
+
+.loading-screen.glitching {
+  animation: flicker 0.6s ease-in-out;
+}
+
+.loading-screen.glitching .glitch-text {
+  animation: glitchText 0.6s ease-in-out;
+}
+
+.loading-screen.glitching .scanline-overlay {
+  opacity: 1;
+  animation: flicker 0.4s ease-in-out;
+}
+
+/* Dissolve Grid */
+.dissolve-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  pointer-events: none;
+}
+
+.dissolve-tile {
+  background: var(--color-bg);
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0;
+}
+.reveal.active {
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+/* Logo Glow Effect */
+.logo-glow {
+  filter:
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.8))
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.25))
+    drop-shadow(0 0 12px rgba(163, 163, 163, 0.2));
+}
+
+/* Portfolio Filter Active State */
+.filter-btn.active {
+  background: #a3a3a3;
+  color: #0a0a0a;
+  border-color: #a3a3a3;
+}
+
+/* Image Certificate Modal */
+#image-modal {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+#image-modal.flex {
+  opacity: 1;
+}
+#image-modal-img {
+  background: #111111;
+}

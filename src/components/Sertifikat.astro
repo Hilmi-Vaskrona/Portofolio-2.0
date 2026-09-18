@@ -1,0 +1,103 @@
+---
+const certificates = [
+  { title: 'Sertifikat 1', issuer: 'Penerbit', date: '2024', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-1.webp' },
+  { title: 'Sertifikat 2', issuer: 'Penerbit', date: '2024', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-2.webp' },
+  { title: 'Sertifikat 3', issuer: 'Penerbit', date: '2025', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-3.webp' },
+  { title: 'Sertifikat 4', issuer: 'Penerbit', date: '2025', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-4.webp' },
+  { title: 'Sertifikat 5', issuer: 'Penerbit', date: '2025', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-5.webp' },
+];
+---
+
+<section id="sertifikat" class="py-24 px-6 lg:px-[10%] relative">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <p class="text-sm font-mono text-[#a3a3a3] tracking-[0.3em] uppercase mb-3">Achievements</p>
+      <h2 class="text-5xl lg:text-6xl font-black text-[#e5e5e5]">Serti<span class="text-[#a3a3a3]">fikat</span></h2>
+      <div class="w-20 h-1 bg-[#a3a3a3] mx-auto mt-6 rounded-full shadow-[0_0_15px_#a3a3a366]"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {certificates.map((cert) => (
+        <div
+          class="cert-card group relative rounded-2xl border border-[#262626] bg-[#111111]/80 hover:border-[#a3a3a3]/40 hover:shadow-[0_0_30px_#a3a3a311] transition-all duration-500 cursor-pointer overflow-hidden reveal"
+          data-image={cert.image}
+          data-title={cert.title}
+        >
+          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#a3a3a3]/10 to-transparent rounded-bl-3xl z-10"></div>
+
+          <div class="relative aspect-[4/3] overflow-hidden flex items-center justify-center bg-[#0a0a0a]">
+            <img src={cert.image} alt={cert.title} loading="lazy" class="w-full h-full object-contain" />
+            <div class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+              <span class="px-5 py-2.5 rounded-full bg-[#a3a3a3] text-[#0a0a0a] text-sm font-bold transition-transform group-hover:scale-105">Lihat Sertifikat</span>
+            </div>
+          </div>
+
+          <div class="p-6 relative">
+            <h3 class="text-lg font-bold text-[#e5e5e5] group-hover:text-[#d4d4d4] transition-colors">{cert.title}</h3>
+            <p class="text-sm text-[#a3a3a3]/70 mt-1">{cert.issuer} &middot; {cert.date}</p>
+            <p class="text-sm text-[#525252] mt-2 leading-relaxed">{cert.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Modal -->
+<div id="image-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+  <div id="image-modal-backdrop" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+  <div class="relative w-full max-w-4xl h-[90vh] rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden flex flex-col">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-[#262626] bg-[#0a0a0a]/80">
+      <h3 id="image-modal-title" class="text-lg font-bold text-[#e5e5e5] truncate">Sertifikat</h3>
+      <div class="flex items-center gap-3">
+        <a id="image-download" href="#" download class="px-4 py-2 rounded-lg bg-[#a3a3a3] text-[#0a0a0a] text-sm font-bold hover:bg-[#d4d4d4] transition-colors cursor-pointer">Download</a>
+        <button id="image-modal-close" class="w-9 h-9 rounded-lg flex items-center justify-center text-[#a3a3a3] hover:text-[#e5e5e5] hover:bg-[#1a1a1a] transition-colors cursor-pointer" aria-label="Tutup">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-auto bg-[#0a0a0a] flex items-center justify-center p-4">
+      <img id="image-modal-img" src="" alt="Sertifikat" class="max-w-full max-h-[75vh] object-contain rounded-lg" />
+    </div>
+  </div>
+</div>
+
+<script>
+  const cards = document.querySelectorAll('.cert-card');
+  const modal = document.getElementById('image-modal');
+  const backdrop = document.getElementById('image-modal-backdrop');
+  const closeBtn = document.getElementById('image-modal-close');
+  const modalTitle = document.getElementById('image-modal-title');
+  const modalImg = document.getElementById('image-modal-img');
+  const downloadBtn = document.getElementById('image-download');
+
+  function closeModal() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
+
+  function openModal(card) {
+    const image = card.getAttribute('data-image');
+    const title = card.getAttribute('data-title') || 'Sertifikat';
+    if (!image) return;
+    modalTitle.textContent = title;
+    modalImg.src = image;
+    modalImg.alt = title;
+    downloadBtn.href = image;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+  }
+
+  cards.forEach((card) => {
+    card.addEventListener('click', () => openModal(card));
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', closeModal);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
