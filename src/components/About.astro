@@ -1,34 +1,86 @@
 ---
+const specs = [
+  { label: 'SCHOOL', value: 'SMK Madinatul Quran' },
+  { label: 'MAJOR', value: 'Rekayasa Perangkat Lunak (RPL)' },
+  { label: 'ROLE', value: 'Software Engineer & UI/UX' },
+  { label: 'LOCATION', value: 'Karawang, Jawa Barat' },
+];
 ---
 
-<section id="about" class="py-24 px-6 lg:px-[10%] relative">
-  <div class="max-w-5xl mx-auto">
-    <div class="text-center mb-16 reveal">
-      <p class="text-sm font-mono text-[#a3a3a3] tracking-[0.3em] uppercase mb-3">Get to know me</p>
-      <h2 class="text-5xl lg:text-6xl font-black text-[#e5e5e5]">About <span class="text-[#a3a3a3]">Me</span></h2>
-      <div class="w-20 h-1 bg-[#a3a3a3] mx-auto mt-6 rounded-full shadow-[0_0_15px_#a3a3a366]"></div>
+<section id="about" class="relative overflow-hidden">
+  <!-- Chanhdai Section Header Bar -->
+  <div class="border-b border-[#262626] px-6 py-3 flex items-center justify-between text-xs font-mono text-[#525252] bg-[#0a0a0a]">
+    <span>SEC // 02 &mdash; OVERVIEW</span>
+    <span>[ ABOUT_ME.MDX ]</span>
+  </div>
+
+  <!-- JackieZhang Kinetic Scroll Marquee Background -->
+  <div class="pointer-events-none select-none overflow-hidden py-4 border-b border-[#262626]/60 bg-[#0d0d0d]">
+    <div class="scroll-marquee-track whitespace-nowrap font-display text-3xl sm:text-5xl font-black tracking-widest text-[#1a1a1a] uppercase" data-marquee-speed="0.18">
+      <span>ABOUT ME &bull; SOFTWARE ENGINEER &bull; UI/UX DESIGNER &bull; FRONTEND CRAFTSMAN &bull; </span>
+      <span>ABOUT ME &bull; SOFTWARE ENGINEER &bull; UI/UX DESIGNER &bull; FRONTEND CRAFTSMAN &bull; </span>
+    </div>
+  </div>
+
+  <div class="p-6 lg:p-12 relative">
+    <span class="corner-plus -top-[5px] -left-[5px]"></span>
+    <span class="corner-plus -top-[5px] -right-[5px]"></span>
+
+    <div class="mb-10 reveal velocity-skew">
+      <p class="text-xs font-mono text-[#a3a3a3] tracking-[0.3em] uppercase mb-2">Get to know me</p>
+      <h2 class="text-4xl lg:text-5xl font-black text-[#e5e5e5]">About <span class="text-[#a3a3a3]">Me</span></h2>
     </div>
 
-    <div class="relative p-8 lg:p-12 rounded-3xl border border-[#262626] bg-[#111111]/50 backdrop-blur-sm reveal">
-      <div class="absolute -top-4 left-8 text-6xl text-[#a3a3a3]/20 font-serif">"</div>
+    <!-- Chanhdai Bento Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 border border-[#262626] rounded-2xl overflow-hidden bg-[#111111]/40">
+      <!-- Quote & Bio Cell -->
+      <div class="lg:col-span-8 p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-[#262626] spotlight-card reveal">
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-[#262626] bg-[#0a0a0a] text-[11px] font-mono text-[#a3a3a3] mb-6">
+          <span>PHILOSOPHY</span>
+        </div>
 
-      <p class="text-lg lg:text-xl text-[#a3a3a3] font-semibold text-center italic mb-8 leading-relaxed">
-        "Setiap ide punya potensi besar, dan teknologi adalah alat untuk mewujudkannya menjadi sesuatu yang nyata dan bermakna."
-      </p>
+        <blockquote class="text-lg lg:text-xl text-[#e5e5e5] font-medium italic mb-8 pl-4 border-l-2 border-[#a3a3a3] leading-relaxed">
+          "Setiap ide punya potensi besar, dan teknologi adalah alat untuk mewujudkannya menjadi sesuatu yang nyata dan bermakna."
+        </blockquote>
 
-      <div class="space-y-6 text-[#a3a3a3] text-base lg:text-lg leading-relaxed">
-        <p class="reveal">
-          Saya adalah murid SMK Madinatul Quran yang memilih jurusan RPL dan sedang memulai perjalanan baru sebagai seorang Software Engineer. Saat ini saya berusia 16 tahun, masih di awal perjalanan, tetapi selalu bersemangat untuk belajar dan berkembang.
-        </p>
-        <p class="reveal">
-          Saya mampu bekerja secara individu, berpikir kreatif, dan terus mengikuti perkembangan teknologi untuk menciptakan solusi yang inovatif dan efisien.
-        </p>
-        <p class="reveal">
-          Meskipun masih dalam tahap awal karir, saya telah menguasai beberapa keterampilan yang dapat diandalkan dalam dunia teknologi, seperti pemrograman, UI/UX design, dan pengembangan web.
-        </p>
+        <div class="space-y-4 text-[#a3a3a3] text-sm lg:text-base leading-relaxed">
+          <p>
+            Saya adalah murid SMK Madinatul Quran yang memilih jurusan RPL dan sedang memulai perjalanan baru sebagai seorang Software Engineer. Saat ini saya berusia 18 tahun, masih di awal perjalanan, tetapi selalu bersemangat untuk belajar dan berkembang.
+          </p>
+          <p>
+            Saya mampu bekerja secara individu, berpikir kreatif, dan terus mengikuti perkembangan teknologi untuk menciptakan solusi yang inovatif dan efisien.
+          </p>
+          <p>
+            Meskipun masih dalam tahap awal karir, saya telah menguasai beberapa keterampilan yang dapat diandalkan dalam dunia teknologi, seperti pemrograman, UI/UX design, dan pengembangan web.
+          </p>
+        </div>
       </div>
 
-      <div class="absolute -bottom-4 right-8 text-6xl text-[#a3a3a3]/20 font-serif rotate-180">"</div>
+      <!-- Technical Specifications Cell (Chanhdai style) -->
+      <div class="lg:col-span-4 flex flex-col justify-between bg-[#0d0d0d] spotlight-card reveal" style="--reveal-delay: 120ms;">
+        <div class="p-6 lg:p-8 border-b border-[#262626]">
+          <p class="text-xs font-mono text-[#a3a3a3] uppercase tracking-widest mb-6">SYSTEM_SPECS</p>
+          <div class="space-y-4">
+            {specs.map((s) => (
+              <div class="border-b border-[#262626]/70 pb-3 last:border-none last:pb-0">
+                <p class="text-[10px] font-mono text-[#525252]">{s.label}</p>
+                <p class="text-sm font-medium text-[#e5e5e5] mt-0.5">{s.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div class="p-6 lg:p-8 hatch-bg">
+          <p class="text-xs font-mono text-[#a3a3a3] mb-2">CORE STACK</p>
+          <div class="flex flex-wrap gap-1.5">
+            {['HTML5', 'CSS3', 'JavaScript', 'Tailwind', 'Astro', 'Figma', 'UI/UX', 'Laravel'].map((tag) => (
+              <span class="px-2.5 py-1 text-[11px] font-mono rounded bg-[#0a0a0a] text-[#a3a3a3] border border-[#262626] hover:border-[#a3a3a3] hover:text-[#e5e5e5] transition-colors">
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

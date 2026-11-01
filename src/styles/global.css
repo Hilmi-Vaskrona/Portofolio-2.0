@@ -11,6 +11,17 @@
   --color-text-muted: #a3a3a3;
   --color-text-dim: #525252;
   --color-border: #262626;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Cinzel', serif;
+  --font-wide: 'Syncopate', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+:root {
+  --scroll-skew: 0deg;
+  --scroll-scale: 1;
+  --scroll-y: 0;
 }
 
 html {
@@ -23,8 +34,13 @@ body {
   margin: 0;
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
   overflow-x: hidden;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
 }
 
 ::selection {
@@ -43,6 +59,430 @@ body {
   border-radius: 3px;
 }
 
+/* =========================================================
+   1. CHANHDAI.COM — TECHNICAL GRID, HATCH DIVIDERS & CROSSHAIRS
+   ========================================================= */
+.hatch-divider {
+  position: relative;
+  height: 28px;
+  width: 100%;
+  border-top: 1px solid #262626;
+  border-bottom: 1px solid #262626;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #1f1f1f 0,
+    #1f1f1f 1px,
+    transparent 1px,
+    transparent 8px
+  );
+}
+
+.hatch-bg {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(38, 38, 38, 0.5) 0,
+    rgba(38, 38, 38, 0.5) 1px,
+    transparent 1px,
+    transparent 9px
+  );
+}
+
+.dot-matrix-bg {
+  background-image: radial-gradient(#262626 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.corner-plus {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  pointer-events: none;
+  z-index: 20;
+}
+.corner-plus::before,
+.corner-plus::after {
+  content: '';
+  position: absolute;
+  background-color: #737373;
+}
+.corner-plus::before {
+  top: 5px;
+  left: 0;
+  width: 11px;
+  height: 1px;
+}
+.corner-plus::after {
+  top: 0;
+  left: 5px;
+  width: 1px;
+  height: 11px;
+}
+
+/* =========================================================
+   2. METALAB.COM — MORPHING ORB NAVBAR & SLOT-ROLL HOVER
+   ========================================================= */
+#navbar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  padding-top: 0;
+  transition: padding 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#navbar-shell {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 94%;
+  max-width: 1480px;
+  height: 4.75rem;
+  padding: 0 2.25rem;
+  background: rgba(17, 17, 17, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid #333333;
+  border-left: 1px solid #262626;
+  border-right: 1px solid #262626;
+  border-top: 1px solid transparent;
+  border-radius: 0px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.65);
+  transition:
+    width 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    max-width 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.4s ease,
+    border-color 0.4s ease,
+    box-shadow 0.5s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+}
+
+/* Scrolled state: shrinks into a floating circular orb */
+#navbar-wrapper.is-scrolled {
+  padding-top: 1rem;
+}
+
+#navbar-wrapper.is-scrolled #navbar-shell {
+  width: 3.75rem;
+  max-width: 3.75rem;
+  height: 3.75rem;
+  padding: 0;
+  gap: 0;
+  justify-content: center;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(212, 212, 212, 0.65);
+  background: rgba(20, 20, 20, 0.96);
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.85),
+    0 0 28px rgba(212, 212, 212, 0.25),
+    inset 0 0 14px rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+}
+
+/* Pulse ring around the orb when collapsed */
+#navbar-orb-ring {
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  border: 1px solid rgba(229, 229, 229, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+#navbar-wrapper.is-scrolled:not(.is-expanded):not(:hover) #navbar-orb-ring {
+  opacity: 1;
+  animation: orbPulse 2.2s infinite ease-out;
+}
+
+@keyframes orbPulse {
+  0% { transform: scale(0.95); opacity: 0.75; }
+  70% { transform: scale(1.18); opacity: 0; }
+  100% { transform: scale(1.18); opacity: 0; }
+}
+
+/* Hide brand text & menu links while collapsed into the circle */
+#navbar-wrapper.is-scrolled:not(.is-expanded) #navbar-shell:not(:hover) .nav-brand-text,
+#navbar-wrapper.is-scrolled:not(.is-expanded) #navbar-shell:not(:hover) #nav-links-container,
+#navbar-wrapper.is-scrolled:not(.is-expanded) #navbar-shell:not(:hover) #nav-status-badge,
+#navbar-wrapper.is-scrolled:not(.is-expanded) #navbar-shell:not(:hover) #mobile-menu-btn {
+  opacity: 0;
+  max-width: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  transform: translateY(8px) scale(0.92);
+  margin: 0;
+  padding: 0;
+  border-width: 0;
+  overflow: hidden;
+}
+
+#navbar-wrapper.is-scrolled:not(.is-expanded) #navbar-shell:not(:hover) #nav-brand-link {
+  margin: 0;
+  gap: 0;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Expanded on hover when scrolled: morphs from circle into sleek floating capsule */
+#navbar-wrapper.is-scrolled.is-expanded #navbar-shell,
+#navbar-wrapper.is-scrolled #navbar-shell:hover {
+  width: auto;
+  max-width: 72rem;
+  height: 4rem;
+  padding: 0 1.75rem;
+  justify-content: space-between;
+  gap: 2.25rem;
+  border-radius: 9999px;
+  border-color: rgba(212, 212, 212, 0.55);
+  background: rgba(16, 16, 16, 0.96);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.9),
+    0 0 40px rgba(212, 212, 212, 0.22);
+}
+
+.nav-brand-text,
+#nav-links-container,
+#nav-status-badge {
+  transition:
+    opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    max-width 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  max-width: 48rem;
+}
+
+/* Staggered menu item entrance when orb expands */
+#navbar-wrapper.is-scrolled .metalab-nav-item {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.25s ease;
+  transition-delay: calc(var(--item-index, 0) * 40ms);
+}
+
+#navbar-wrapper.is-scrolled.is-expanded .metalab-nav-item,
+#navbar-wrapper.is-scrolled #navbar-shell:hover .metalab-nav-item,
+#navbar-wrapper:not(.is-scrolled) .metalab-nav-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Metalab.com Slot-Machine Dual-Text Hover Roll + Magnetic Pill */
+.metalab-nav-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.9rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #a3a3a3;
+  text-decoration: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.metalab-text-wrap {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  line-height: 1.25;
+}
+
+.metalab-text-primary,
+.metalab-text-clone {
+  display: block;
+  transition: transform 0.42s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.42s cubic-bezier(0.19, 1, 0.22, 1);
+  will-change: transform;
+}
+
+.metalab-text-clone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  color: #e5e5e5;
+  font-weight: 600;
+  transform: translateY(115%) rotateZ(4deg);
+}
+
+.metalab-nav-item:hover .metalab-text-primary {
+  transform: translateY(-115%) rotateZ(-4deg);
+  opacity: 0.2;
+}
+
+.metalab-nav-item:hover .metalab-text-clone {
+  transform: translateY(0%) rotateZ(0deg);
+}
+
+/* Magnetic sliding pill indicator behind nav items */
+#nav-hover-pill {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 2rem;
+  border-radius: 9999px;
+  background: rgba(163, 163, 163, 0.14);
+  border: 1px solid rgba(163, 163, 163, 0.28);
+  box-shadow: 0 0 18px rgba(163, 163, 163, 0.15);
+  transform: translate(var(--pill-x, 0px), -50%);
+  width: var(--pill-w, 0px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition:
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.25s ease;
+}
+
+/* =========================================================
+   3. JONASMOSESSON.SE — KINETIC FLOATING ELEMENTS AROUND HERO TITLE
+   ========================================================= */
+@keyframes floatBobSlow {
+  0%, 100% { transform: translate3d(0, 0px, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -10px, 0) rotate(6deg); }
+}
+
+@keyframes floatBobReverse {
+  0%, 100% { transform: translate3d(0, 0px, 0) rotate(0deg); }
+  50% { transform: translate3d(0, 9px, 0) rotate(-7deg); }
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinReverseSlow {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes pulseScale {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.18); opacity: 1; }
+}
+
+@keyframes dashDraw {
+  0% { stroke-dashoffset: 120; }
+  50% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -120; }
+}
+
+.kinetic-float-1 {
+  animation: floatBobSlow 4.5s ease-in-out infinite;
+}
+.kinetic-float-2 {
+  animation: floatBobReverse 5.2s ease-in-out infinite;
+}
+.kinetic-spin {
+  animation: spinSlow 14s linear infinite;
+}
+.kinetic-spin-reverse {
+  animation: spinReverseSlow 18s linear infinite;
+}
+.kinetic-pulse {
+  animation: pulseScale 3.2s ease-in-out infinite;
+}
+.kinetic-draw {
+  stroke-dasharray: 60;
+  animation: dashDraw 5s ease-in-out infinite;
+}
+
+/* Interactive character hover on "Hi, I'm Hilmi" */
+.hero-char {
+  display: inline-block;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.3s ease,
+    text-shadow 0.3s ease;
+  cursor: default;
+}
+.hero-char:hover {
+  transform: translateY(-8px) scale(1.08) rotate(-2deg);
+  color: #ffffff;
+  text-shadow: 0 0 28px rgba(212, 212, 212, 0.65);
+}
+
+/* =========================================================
+   4. JACKIEZHANG + CRRTT + GUGLIERI — SCROLL & VISUAL TRANSITIONS
+   ========================================================= */
+/* Crrtt.com Scroll Velocity Distortion */
+.velocity-skew {
+  will-change: transform;
+  transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: skewY(var(--scroll-skew, 0deg)) scaleY(var(--scroll-scale, 1));
+}
+
+/* Guglieri.com Blur-to-Sharp & Depth Scale Reveal */
+.reveal {
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateY(36px) scale(0.96);
+  transition:
+    opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, filter, transform;
+}
+
+.reveal.active {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0) scale(1);
+}
+
+/* Guglieri & Chanhdai Cursor-Tracking Spotlight Card */
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.spotlight-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    550px circle at var(--mouse-x, -500px) var(--mouse-y, -500px),
+    rgba(212, 212, 212, 0.09),
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+
+/* JackieZhang Scroll-Linked Kinetic Marquee */
+.scroll-marquee-track {
+  will-change: transform;
+  transition: transform 0.1s linear;
+}
+
+/* Loading Screen & Glitch Effects */
 .loading-screen {
   position: fixed;
   inset: 0;
@@ -54,7 +494,6 @@ body {
   pointer-events: none;
 }
 
-/* Scanline Overlay */
 .scanline-overlay {
   position: absolute;
   inset: 0;
@@ -70,7 +509,6 @@ body {
   );
 }
 
-/* Glitch Text Effect */
 @keyframes glitchText {
   0%, 100% { text-shadow: none; transform: translate(0); }
   10% { text-shadow: -3px 0 #ff0040, 3px 0 #00fff9; transform: translate(-2px, 1px); }
@@ -96,15 +534,6 @@ body {
   85% { opacity: 1; }
 }
 
-@keyframes glitchSlice {
-  0%, 100% { clip-path: inset(0 0 100% 0); opacity: 0; }
-  10% { clip-path: inset(20% 0 60% 0); opacity: 1; transform: translate(-8px, 0); }
-  20% { clip-path: inset(50% 0 30% 0); opacity: 1; transform: translate(8px, 0); }
-  30% { clip-path: inset(10% 0 70% 0); opacity: 1; transform: translate(-4px, 0); }
-  40% { clip-path: inset(80% 0 5% 0); opacity: 1; transform: translate(4px, 0); }
-  50% { clip-path: inset(0 0 100% 0); opacity: 0; }
-}
-
 .loading-screen.glitching {
   animation: flicker 0.6s ease-in-out;
 }
@@ -118,7 +547,6 @@ body {
   animation: flicker 0.4s ease-in-out;
 }
 
-/* Dissolve Grid */
 .dissolve-grid {
   position: absolute;
   inset: 0;
@@ -132,19 +560,6 @@ body {
   opacity: 0;
 }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.reveal {
-  opacity: 0;
-}
-.reveal.active {
-  animation: fadeInUp 0.8s ease forwards;
-}
-
-/* Logo Glow Effect */
 .logo-glow {
   filter:
     drop-shadow(0 0 1px rgba(255, 255, 255, 0.8))
@@ -152,14 +567,12 @@ body {
     drop-shadow(0 0 12px rgba(163, 163, 163, 0.2));
 }
 
-/* Portfolio Filter Active State */
 .filter-btn.active {
   background: #a3a3a3;
   color: #0a0a0a;
   border-color: #a3a3a3;
 }
 
-/* Image Certificate Modal */
 #image-modal {
   opacity: 0;
   transition: opacity 0.25s ease;

@@ -7,7 +7,6 @@ import About from '../components/About.astro';
 import Experience from '../components/Experience.astro';
 import Portfolio from '../components/Portfolio.astro';
 import Sertifikat from '../components/Sertifikat.astro';
-
 import Contact from '../components/Contact.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
@@ -15,62 +14,160 @@ import '../styles/global.css';
 
 <Layout title="CV Hilmi Zaki R">
   <LoadingScreen />
-  <div id="main-content" style="opacity: 0;">
-    <Navbar />
-    <Hero />
-    <About />
-    <Experience />
-    <Portfolio />
-    <Sertifikat />
+  <Navbar />
 
-    <Contact />
-    <Footer />
+  <div id="main-content" style="opacity: 0;">
+    <!-- Chanhdai.com Framed Technical Grid Wrapper -->
+    <div class="w-[94%] max-w-[1480px] mx-auto border-x border-[#262626] bg-[#0a0a0a] relative min-h-screen">
+      <Hero />
+
+      <!-- Hatched Pattern Divider -->
+      <div class="hatch-divider">
+        <span class="corner-plus -top-[5px] -left-[5px]"></span>
+        <span class="corner-plus -top-[5px] -right-[5px]"></span>
+        <span class="corner-plus -bottom-[5px] -left-[5px]"></span>
+        <span class="corner-plus -bottom-[5px] -right-[5px]"></span>
+      </div>
+
+      <About />
+
+      <div class="hatch-divider">
+        <span class="corner-plus -top-[5px] -left-[5px]"></span>
+        <span class="corner-plus -top-[5px] -right-[5px]"></span>
+        <span class="corner-plus -bottom-[5px] -left-[5px]"></span>
+        <span class="corner-plus -bottom-[5px] -right-[5px]"></span>
+      </div>
+
+      <Experience />
+
+      <div class="hatch-divider">
+        <span class="corner-plus -top-[5px] -left-[5px]"></span>
+        <span class="corner-plus -top-[5px] -right-[5px]"></span>
+        <span class="corner-plus -bottom-[5px] -left-[5px]"></span>
+        <span class="corner-plus -bottom-[5px] -right-[5px]"></span>
+      </div>
+
+      <Portfolio />
+
+      <div class="hatch-divider">
+        <span class="corner-plus -top-[5px] -left-[5px]"></span>
+        <span class="corner-plus -top-[5px] -right-[5px]"></span>
+        <span class="corner-plus -bottom-[5px] -left-[5px]"></span>
+        <span class="corner-plus -bottom-[5px] -right-[5px]"></span>
+      </div>
+
+      <Sertifikat />
+
+      <div class="hatch-divider">
+        <span class="corner-plus -top-[5px] -left-[5px]"></span>
+        <span class="corner-plus -top-[5px] -right-[5px]"></span>
+        <span class="corner-plus -bottom-[5px] -left-[5px]"></span>
+        <span class="corner-plus -bottom-[5px] -right-[5px]"></span>
+      </div>
+
+      <Contact />
+      <Footer />
+    </div>
   </div>
 
   <script>
     import Lenis from 'lenis';
     import { animate } from 'animejs';
 
+    // 1. Lenis Smooth Scroll + Crrtt.com Velocity Skew + JackieZhang Scroll Marquee Scrubbing
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: function(t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
+      duration: 1.25,
+      easing: function (t) {
+        return Math.min(1, 1.001 - Math.pow(2, -10 * t));
+      },
       smoothWheel: true,
     });
 
-    function raf(time) {
+    const marqueeTracks = document.querySelectorAll('.scroll-marquee-track');
+    const parallaxNodes = document.querySelectorAll('[data-scroll-speed]');
+
+    lenis.on('scroll', (e: any) => {
+      const scrollY = e.scroll || window.scrollY;
+      const velocity = e.velocity || 0;
+
+      // Crrtt.com velocity skew & subtle stretch (clamped for readability)
+      const clampedSkew = Math.max(-2.6, Math.min(2.6, velocity * 0.14));
+      const clampedScale = 1 + Math.min(0.035, Math.abs(velocity) * 0.0012);
+      document.documentElement.style.setProperty('--scroll-skew', `${clampedSkew.toFixed(2)}deg`);
+      document.documentElement.style.setProperty('--scroll-scale', `${clampedScale.toFixed(4)}`);
+
+      // JackieZhang horizontal scroll-linked marquee tracks
+      marqueeTracks.forEach((track) => {
+        const el = track as HTMLElement;
+        const speed = parseFloat(el.dataset.marqueeSpeed || '0.15');
+        const offset = (scrollY * speed) % 600;
+        el.style.transform = `translate3d(${-offset}px, 0, 0)`;
+      });
+
+      // Parallax background orbs
+      parallaxNodes.forEach((node) => {
+        const el = node as HTMLElement;
+        const speed = parseFloat(el.dataset.scrollSpeed || '0.1');
+        el.style.transform = `translate3d(0, ${scrollY * speed}px, 0)`;
+      });
+    });
+
+    function raf(time: number) {
       lenis.raf(time);
       requestAnimationFrame(raf);
     }
     requestAnimationFrame(raf);
 
-    var mainContent = document.getElementById('main-content');
-    var loadingScreen = document.getElementById('loading-screen');
-    var progressBar = document.getElementById('loading-progress');
-    var loadingPercent = document.getElementById('loading-percent');
-    var logo = document.getElementById('loading-logo');
-    var dissolveGrid = document.getElementById('dissolve-grid');
+    // 2. Guglieri.com & Chanhdai.com Cursor-Tracking Spotlight Cards
+    function initSpotlightCards() {
+      const cards = document.querySelectorAll('.spotlight-card');
+      window.addEventListener(
+        'mousemove',
+        (e) => {
+          cards.forEach((card) => {
+            const el = card as HTMLElement;
+            const rect = el.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            el.style.setProperty('--mouse-x', `${x}px`);
+            el.style.setProperty('--mouse-y', `${y}px`);
+          });
+        },
+        { passive: true }
+      );
+    }
 
-    var progress = 0;
-    var interval = setInterval(function() {
-      progress += Math.random() * 15 + 5;
+    // 3. Loading Screen & Grid Dissolve Transition
+    const mainContent = document.getElementById('main-content');
+    const loadingScreen = document.getElementById('loading-screen');
+    const progressBar = document.getElementById('loading-progress');
+    const loadingPercent = document.getElementById('loading-percent');
+    const logo = document.getElementById('loading-logo');
+    const dissolveGrid = document.getElementById('dissolve-grid');
+
+    let progress = 0;
+    const interval = setInterval(function () {
+      progress += Math.random() * 18 + 8;
       if (progress >= 100) {
         progress = 100;
         clearInterval(interval);
-        setTimeout(function() { startExitAnimation(); }, 400);
+        setTimeout(function () {
+          startExitAnimation();
+        }, 300);
       }
       if (progressBar) progressBar.style.width = progress + '%';
       if (loadingPercent) loadingPercent.textContent = Math.floor(progress) + '%';
-    }, 150);
+    }, 120);
 
     function createDissolveGrid() {
       if (!dissolveGrid) return;
-      var gridCols = 16;
-      var gridRows = 9;
+      const gridCols = 16;
+      const gridRows = 9;
       dissolveGrid.style.gridTemplateColumns = 'repeat(' + gridCols + ', 1fr)';
       dissolveGrid.style.gridTemplateRows = 'repeat(' + gridRows + ', 1fr)';
 
-      for (var i = 0; i < gridCols * gridRows; i++) {
-        var tile = document.createElement('div');
+      for (let i = 0; i < gridCols * gridRows; i++) {
+        const tile = document.createElement('div');
         tile.className = 'dissolve-tile';
         dissolveGrid.appendChild(tile);
       }
@@ -79,22 +176,17 @@ import '../styles/global.css';
     function startExitAnimation() {
       if (!loadingScreen) return;
 
-      var cols = 16;
-      var rows = 9;
+      const cols = 16;
+      const rows = 9;
 
-      // Phase 1: Glitch (0 - 600ms)
       loadingScreen.classList.add('glitching');
 
-      // Phase 2: Dissolve (600ms - 1400ms)
-      setTimeout(function() {
+      setTimeout(function () {
         createDissolveGrid();
-        var tiles = document.querySelectorAll('.dissolve-tile');
-        var totalTiles = tiles.length;
+        const tiles = document.querySelectorAll('.dissolve-tile');
 
-        // Make loading screen background transparent so tiles are visible
         loadingScreen.style.background = 'transparent';
 
-        // Hide logo
         if (logo) {
           animate(logo, {
             opacity: [1, 0],
@@ -104,21 +196,19 @@ import '../styles/global.css';
           });
         }
 
-        // Animate each tile: appear then dissolve
-        tiles.forEach(function(tile, i) {
-          var row = Math.floor(i / cols);
-          var col = i % cols;
-          var centerDist = Math.sqrt(
+        tiles.forEach(function (tile, i) {
+          const row = Math.floor(i / cols);
+          const col = i % cols;
+          const centerDist = Math.sqrt(
             Math.pow(col - cols / 2, 2) + Math.pow(row - rows / 2, 2)
           );
-          var maxDist = Math.sqrt(Math.pow(cols / 2, 2) + Math.pow(rows / 2, 2));
-          var normalizedDist = centerDist / maxDist;
+          const maxDist = Math.sqrt(Math.pow(cols / 2, 2) + Math.pow(rows / 2, 2));
+          const normalizedDist = centerDist / maxDist;
 
-          // Random delay based on distance from center + randomness
-          var delay = normalizedDist * 300 + Math.random() * 200;
-          var randomX = (Math.random() - 0.5) * 200;
-          var randomY = (Math.random() - 0.5) * 200;
-          var randomRotate = (Math.random() - 0.5) * 90;
+          const delay = normalizedDist * 260 + Math.random() * 180;
+          const randomX = (Math.random() - 0.5) * 200;
+          const randomY = (Math.random() - 0.5) * 200;
+          const randomRotate = (Math.random() - 0.5) * 90;
 
           animate(tile, {
             opacity: [0, 1, 1, 0],
@@ -126,35 +216,41 @@ import '../styles/global.css';
             translateY: [0, 0, randomY],
             rotate: [0, 0, randomRotate],
             scale: [0.5, 1, 0.3],
-            duration: 800,
+            duration: 750,
             delay: delay,
             easing: 'easeOutCubic',
           });
         });
 
-        // Phase 3: Reveal content (after dissolve)
-        setTimeout(function() {
+        setTimeout(function () {
           if (loadingScreen) loadingScreen.style.display = 'none';
           if (mainContent) {
             mainContent.style.opacity = '1';
             mainContent.style.transition = 'opacity 0.6s ease';
           }
           initScrollAnimations();
-        }, 900);
-      }, 600);
+          initSpotlightCards();
+        }, 800);
+      }, 500);
     }
 
+    // 4. Guglieri.com Blur-to-Sharp & Depth Scale Intersection Reveal
     function initScrollAnimations() {
-      var reveals = document.querySelectorAll('.reveal');
-      var observer = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-          }
-        });
-      }, { threshold: 0.15 });
+      const reveals = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('active');
+            }
+          });
+        },
+        { threshold: 0.12 }
+      );
 
-      reveals.forEach(function(el) { observer.observe(el); });
+      reveals.forEach(function (el) {
+        observer.observe(el);
+      });
     }
   </script>
 </Layout>

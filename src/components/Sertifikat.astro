@@ -1,41 +1,63 @@
 ---
 const certificates = [
-  { title: 'Sertifikat 1', issuer: 'Penerbit', date: '2024', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-1.webp' },
-  { title: 'Sertifikat 2', issuer: 'Penerbit', date: '2024', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-2.webp' },
-  { title: 'Sertifikat 3', issuer: 'Penerbit', date: '2025', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-3.webp' },
-  { title: 'Sertifikat 4', issuer: 'Penerbit', date: '2025', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-4.webp' },
-  { title: 'Sertifikat 5', issuer: 'Penerbit', date: '2025', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-5.webp' },
+  { id: 'CRT-01', title: 'Sertifikat 1', issuer: 'Penerbit', date: '2024', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-1.webp' },
+  { id: 'CRT-02', title: 'Sertifikat 2', issuer: 'Penerbit', date: '2024', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-2.webp' },
+  { id: 'CRT-03', title: 'Sertifikat 3', issuer: 'Penerbit', date: '2025', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-3.webp' },
+  { id: 'CRT-04', title: 'Sertifikat 4', issuer: 'Penerbit', date: '2025', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-4.webp' },
+  { id: 'CRT-05', title: 'Sertifikat 5', issuer: 'Penerbit', date: '2025', description: 'Sertifikat kompetensi.', image: '/sertifikat/sertifikat-5.webp' },
 ];
 ---
 
-<section id="sertifikat" class="py-24 px-6 lg:px-[10%] relative">
-  <div class="max-w-6xl mx-auto">
-    <div class="text-center mb-16 reveal">
-      <p class="text-sm font-mono text-[#a3a3a3] tracking-[0.3em] uppercase mb-3">Achievements</p>
-      <h2 class="text-5xl lg:text-6xl font-black text-[#e5e5e5]">Serti<span class="text-[#a3a3a3]">fikat</span></h2>
-      <div class="w-20 h-1 bg-[#a3a3a3] mx-auto mt-6 rounded-full shadow-[0_0_15px_#a3a3a366]"></div>
+<section id="sertifikat" class="relative overflow-hidden">
+  <!-- Chanhdai Section Header Bar -->
+  <div class="border-b border-[#262626] px-6 py-3 flex items-center justify-between text-xs font-mono text-[#525252] bg-[#0a0a0a]">
+    <span>SEC // 05 &mdash; CREDENTIALS</span>
+    <span>[ CERTIFICATES.VAULT ]</span>
+  </div>
+
+  <!-- JackieZhang Kinetic Scroll Marquee Background -->
+  <div class="pointer-events-none select-none overflow-hidden py-4 border-b border-[#262626]/60 bg-[#0d0d0d]">
+    <div class="scroll-marquee-track whitespace-nowrap font-display text-3xl sm:text-5xl font-black tracking-widest text-[#1a1a1a] uppercase" data-marquee-speed="-0.2">
+      <span>CERTIFICATES &amp; ACHIEVEMENTS &bull; VERIFIED CREDENTIALS &bull; </span>
+      <span>CERTIFICATES &amp; ACHIEVEMENTS &bull; VERIFIED CREDENTIALS &bull; </span>
+    </div>
+  </div>
+
+  <div class="p-6 lg:p-12 relative">
+    <span class="corner-plus -top-[5px] -left-[5px]"></span>
+    <span class="corner-plus -top-[5px] -right-[5px]"></span>
+
+    <div class="mb-10 reveal velocity-skew">
+      <p class="text-xs font-mono text-[#a3a3a3] tracking-[0.3em] uppercase mb-2">Achievements</p>
+      <h2 class="text-4xl lg:text-5xl font-black text-[#e5e5e5]">Serti<span class="text-[#a3a3a3]">fikat</span></h2>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {certificates.map((cert) => (
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {certificates.map((cert, i) => (
         <div
-          class="cert-card group relative rounded-2xl border border-[#262626] bg-[#111111]/80 hover:border-[#a3a3a3]/40 hover:shadow-[0_0_30px_#a3a3a311] transition-all duration-500 cursor-pointer overflow-hidden reveal"
+          class="cert-card spotlight-card group relative rounded-2xl border border-[#262626] bg-[#111111]/80 hover:border-[#a3a3a3]/50 hover:shadow-[0_0_35px_#a3a3a314] transition-all duration-500 cursor-pointer overflow-hidden reveal velocity-skew"
           data-image={cert.image}
           data-title={cert.title}
+          style={`--reveal-delay: ${i * 70}ms;`}
         >
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#a3a3a3]/10 to-transparent rounded-bl-3xl z-10"></div>
+          <div class="px-5 py-2.5 border-b border-[#262626] bg-[#0a0a0a]/80 flex items-center justify-between text-[11px] font-mono text-[#525252]">
+            <span>{cert.id}</span>
+            <span class="text-[#a3a3a3]">{cert.date}</span>
+          </div>
 
-          <div class="relative aspect-[4/3] overflow-hidden flex items-center justify-center bg-[#0a0a0a]">
-            <img src={cert.image} alt={cert.title} loading="lazy" class="w-full h-full object-contain" />
-            <div class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-              <span class="px-5 py-2.5 rounded-full bg-[#a3a3a3] text-[#0a0a0a] text-sm font-bold transition-transform group-hover:scale-105">Lihat Sertifikat</span>
+          <div class="relative aspect-[4/3] overflow-hidden flex items-center justify-center bg-[#0a0a0a] border-b border-[#262626]">
+            <img src={cert.image} alt={cert.title} loading="lazy" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
+            <div class="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+              <span class="px-5 py-2 rounded-full bg-[#e5e5e5] text-[#0a0a0a] text-xs font-mono font-bold uppercase tracking-wider transition-transform group-hover:scale-105">
+                Inspect Credential
+              </span>
             </div>
           </div>
 
-          <div class="p-6 relative">
-            <h3 class="text-lg font-bold text-[#e5e5e5] group-hover:text-[#d4d4d4] transition-colors">{cert.title}</h3>
-            <p class="text-sm text-[#a3a3a3]/70 mt-1">{cert.issuer} &middot; {cert.date}</p>
-            <p class="text-sm text-[#525252] mt-2 leading-relaxed">{cert.description}</p>
+          <div class="p-6 relative z-10">
+            <h3 class="text-lg font-bold text-[#e5e5e5] group-hover:text-white transition-colors">{cert.title}</h3>
+            <p class="text-xs font-mono text-[#a3a3a3]/70 mt-1">{cert.issuer} &middot; {cert.date}</p>
+            <p class="text-sm text-[#a3a3a3] mt-2 leading-relaxed">{cert.description}</p>
           </div>
         </div>
       ))}
@@ -45,12 +67,12 @@ const certificates = [
 
 <!-- Modal -->
 <div id="image-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-  <div id="image-modal-backdrop" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
-  <div class="relative w-full max-w-4xl h-[90vh] rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden flex flex-col">
-    <div class="flex items-center justify-between px-6 py-4 border-b border-[#262626] bg-[#0a0a0a]/80">
+  <div id="image-modal-backdrop" class="absolute inset-0 bg-black/85 backdrop-blur-md"></div>
+  <div class="relative w-full max-w-4xl h-[90vh] rounded-2xl border border-[#262626] bg-[#111111] overflow-hidden flex flex-col z-10">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-[#262626] bg-[#0a0a0a]/90">
       <h3 id="image-modal-title" class="text-lg font-bold text-[#e5e5e5] truncate">Sertifikat</h3>
       <div class="flex items-center gap-3">
-        <a id="image-download" href="#" download class="px-4 py-2 rounded-lg bg-[#a3a3a3] text-[#0a0a0a] text-sm font-bold hover:bg-[#d4d4d4] transition-colors cursor-pointer">Download</a>
+        <a id="image-download" href="#" download class="px-4 py-2 rounded-lg bg-[#e5e5e5] text-[#0a0a0a] text-xs font-mono font-bold uppercase tracking-wider hover:bg-[#a3a3a3] transition-colors cursor-pointer">Download</a>
         <button id="image-modal-close" class="w-9 h-9 rounded-lg flex items-center justify-center text-[#a3a3a3] hover:text-[#e5e5e5] hover:bg-[#1a1a1a] transition-colors cursor-pointer" aria-label="Tutup">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -69,16 +91,18 @@ const certificates = [
   const backdrop = document.getElementById('image-modal-backdrop');
   const closeBtn = document.getElementById('image-modal-close');
   const modalTitle = document.getElementById('image-modal-title');
-  const modalImg = document.getElementById('image-modal-img');
-  const downloadBtn = document.getElementById('image-download');
+  const modalImg = document.getElementById('image-modal-img') as HTMLImageElement | null;
+  const downloadBtn = document.getElementById('image-download') as HTMLAnchorElement | null;
 
   function closeModal() {
+    if (!modal) return;
     modal.classList.add('hidden');
     modal.classList.remove('flex');
     document.body.style.overflow = '';
   }
 
-  function openModal(card) {
+  function openModal(card: Element) {
+    if (!modal || !modalTitle || !modalImg || !downloadBtn) return;
     const image = card.getAttribute('data-image');
     const title = card.getAttribute('data-title') || 'Sertifikat';
     if (!image) return;
@@ -95,8 +119,8 @@ const certificates = [
     card.addEventListener('click', () => openModal(card));
   });
 
-  closeBtn.addEventListener('click', closeModal);
-  backdrop.addEventListener('click', closeModal);
+  closeBtn?.addEventListener('click', closeModal);
+  backdrop?.addEventListener('click', closeModal);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeModal();
   });
