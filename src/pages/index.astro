@@ -228,6 +228,10 @@ import '../styles/global.css';
             mainContent.style.opacity = '1';
             mainContent.style.transition = 'opacity 0.6s ease';
           }
+          const navWrapper = document.getElementById('navbar-wrapper');
+          if (navWrapper) {
+            navWrapper.classList.add('nav-ready');
+          }
           initScrollAnimations();
           initSpotlightCards();
         }, 800);
