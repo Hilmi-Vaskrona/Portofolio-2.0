@@ -596,3 +596,52 @@ h1, h2, h3, .font-display {
 #image-modal-img {
   background: #111111;
 }
+
+/* =========================================================
+   5. 3D TWO-SIDED PROFILE COIN FLIP (HERO)
+   ========================================================= */
+.coin-scene {
+  perspective: 1100px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.coin-rotor {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.coin-scene.is-flipping {
+  animation: coinTossPulse 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes coinTossPulse {
+  0% { transform: scale(1) translateY(0); }
+  45% { transform: scale(1.08) translateY(-10px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+.coin-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.coin-face-front {
+  transform: rotateY(0deg) translateZ(2px);
+}
+
+.coin-face-back {
+  transform: rotateY(180deg) translateZ(2px);
+}
+

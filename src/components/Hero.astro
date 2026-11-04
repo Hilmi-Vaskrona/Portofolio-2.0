@@ -197,12 +197,41 @@ const hilmiChars = ['H', 'i', 'l', 'm', 'i'];
             <span class="text-[#a3a3a3]">STATUS: ACTIVE</span>
           </div>
 
-          <div class="relative mx-auto w-52 h-52 sm:w-60 sm:h-60 rounded-full border border-[#a3a3a3]/30 flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] shadow-[0_0_50px_#a3a3a318] group-hover:border-[#a3a3a3]/60 transition-all duration-500">
-            <!-- Rotating technical rings inside avatar frame -->
-            <svg class="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] text-[#262626] group-hover:text-[#a3a3a3]/30 transition-colors duration-500 kinetic-spin" viewBox="0 0 100 100" fill="none">
-              <circle cx="50" cy="50" r="46" stroke="currentColor" stroke-width="0.75" stroke-dasharray="3 5" />
-            </svg>
-            <img src="/logo_vaskrona.png" alt="Hilmi Emblem" class="w-28 h-28 object-contain logo-glow transition-transform duration-500 group-hover:scale-110" />
+          <!-- 3D Two-Sided Coin Container (Front: muka_saya.png, Back: logo_vaskrona.png) -->
+          <div
+            id="profile-coin"
+            class="coin-scene relative mx-auto w-52 h-52 sm:w-60 sm:h-60"
+            role="button"
+            tabindex="0"
+            aria-label="Hilmi Profile"
+          >
+            <div id="profile-coin-rotor" class="coin-rotor">
+              <!-- Front Side (Default):Foto Profil (muka_saya.png) -->
+              <div class="coin-face coin-face-front border-2 border-[#a3a3a3]/40 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] shadow-[0_0_50px_#a3a3a322] group-hover:border-[#e5e5e5]/70 transition-colors duration-500">
+                <img
+                  src="/muka_saya.png"
+                  alt="Foto Profil Hilmi"
+                  class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                />
+                <!-- Subtle inner vignette & tech ring overlay -->
+                <div class="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/15 bg-gradient-to-t from-black/35 via-transparent to-transparent"></div>
+                <svg class="pointer-events-none absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] text-[#e5e5e5]/25 kinetic-spin" viewBox="0 0 100 100" fill="none">
+                  <circle cx="50" cy="50" r="47" stroke="currentColor" stroke-width="0.6" stroke-dasharray="3 6" />
+                </svg>
+              </div>
+
+              <!-- Back Side: Logo Vaskrona -->
+              <div class="coin-face coin-face-back border-2 border-[#a3a3a3]/40 flex items-center justify-center bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] shadow-[0_0_50px_#a3a3a322] group-hover:border-[#e5e5e5]/70 transition-colors duration-500">
+                <svg class="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] text-[#a3a3a3]/35 kinetic-spin" viewBox="0 0 100 100" fill="none">
+                  <circle cx="50" cy="50" r="46" stroke="currentColor" stroke-width="0.75" stroke-dasharray="3 5" />
+                </svg>
+                <img
+                  src="/logo_vaskrona.png"
+                  alt="Logo Vaskrona"
+                  class="w-28 h-28 object-contain logo-glow transition-transform duration-500 group-hover:scale-110"
+                />
+              </div>
+            </div>
           </div>
 
           <div class="mt-6 pt-4 border-t border-[#262626] grid grid-cols-3 gap-2 text-center font-mono">
@@ -305,5 +334,28 @@ const hilmiChars = ['H', 'i', 'l', 'm', 'i'];
         htmlEl.style.transition = '';
       }, 600);
     });
+  });
+
+  // 3D Two-Sided Coin Flip (Front: muka_saya.png -> Back: logo_vaskrona.png)
+  const profileCoin = document.getElementById('profile-coin');
+  const coinRotor = document.getElementById('profile-coin-rotor');
+  let coinDeg = 0;
+
+  function flipProfileCoin() {
+    if (!profileCoin || !coinRotor) return;
+    coinDeg += 540; // 1.5 spins for a realistic 3D coin toss flip to the opposite face
+    coinRotor.style.transform = `rotateY(${coinDeg}deg)`;
+
+    profileCoin.classList.remove('is-flipping');
+    void profileCoin.offsetWidth; // trigger reflow for bounce animation
+    profileCoin.classList.add('is-flipping');
+  }
+
+  profileCoin?.addEventListener('click', flipProfileCoin);
+  profileCoin?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      flipProfileCoin();
+    }
   });
 </script>
