@@ -1,11 +1,427 @@
 ---
+const leftBuildings = [
+  { width: 'w-14 sm:w-20', height: 'h-20 sm:h-28', cols: 3, rows: 4 },
+  { width: 'w-16 sm:w-24', height: 'h-28 sm:h-36', cols: 4, rows: 6 },
+  { width: 'w-12 sm:w-16', height: 'h-16 sm:h-24', cols: 2, rows: 4 },
+  { width: 'w-16 sm:w-22', height: 'h-24 sm:h-32', cols: 3, rows: 5 },
+];
+
+const centerBuildings = [
+  { width: 'w-14 sm:w-20', height: 'h-24 sm:h-32', cols: 3, rows: 5 },
+  { width: 'w-20 sm:w-28', height: 'h-34 sm:h-42', cols: 4, rows: 7, isMainTower: true },
+  { width: 'w-14 sm:w-20', height: 'h-22 sm:h-28', cols: 3, rows: 4 },
+];
+
+const rightBuildings = [
+  { width: 'w-16 sm:w-22', height: 'h-24 sm:h-32', cols: 3, rows: 5 },
+  { width: 'w-12 sm:w-16', height: 'h-16 sm:h-22', cols: 2, rows: 4 },
+  { width: 'w-16 sm:w-24', height: 'h-28 sm:h-36', cols: 4, rows: 6 },
+  { width: 'w-14 sm:w-20', height: 'h-20 sm:h-26', cols: 3, rows: 4 },
+];
 ---
 
-<footer class="border-t border-[#262626] bg-[#0a0a0a] relative">
+<footer id="footer-root" class="border-t border-[#262626] bg-[#070707] relative overflow-hidden select-none">
   <span class="corner-plus -top-[5px] -left-[5px]"></span>
   <span class="corner-plus -top-[5px] -right-[5px]"></span>
 
-  <div class="px-6 py-10 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-6">
+  <!-- Night City Status Header -->
+  <div class="border-b border-[#262626] px-6 py-2.5 flex items-center justify-between text-[11px] font-mono text-[#525252] bg-[#0a0a0a] relative z-20">
+    <div class="flex items-center gap-2">
+      <span id="city-power-dot" class="w-2 h-2 rounded-full bg-[#e5e5e5] animate-pulse shadow-[0_0_8px_#e5e5e5]"></span>
+      <span id="city-status-text" class="text-[#a3a3a3]">NIGHT CITY // SECTOR-09 [INTERACTIVE SKYLINE]</span>
+    </div>
+    <span id="city-hint-text" class="hidden sm:inline text-[#525252]">HOVER &amp; CLICK BUILDINGS TO TOGGLE LIGHTS</span>
+  </div>
+
+  <!-- INTERACTIVE NIGHT CITY SCENE -->
+  <div
+    id="night-city-scene"
+    class="relative w-full h-48 sm:h-56 bg-gradient-to-b from-[#050505] via-[#0a0a0a] to-[#111111] overflow-hidden flex flex-col justify-end"
+  >
+    <!-- Stars Layer -->
+    <div id="city-stars" class="pointer-events-none absolute inset-0 opacity-70 transition-opacity duration-700">
+      <span class="city-star absolute top-6 left-[12%] w-1 h-1 rounded-full bg-[#e5e5e5] animate-pulse"></span>
+      <span class="city-star absolute top-14 left-[24%] w-1.5 h-1.5 rounded-full bg-[#a3a3a3] animate-ping" style="animation-duration: 3.5s;"></span>
+      <span class="city-star absolute top-8 left-[38%] w-1 h-1 rounded-full bg-[#e5e5e5]"></span>
+      <span class="city-star absolute top-16 left-[62%] w-1 h-1 rounded-full bg-[#a3a3a3] animate-pulse"></span>
+      <span class="city-star absolute top-7 left-[78%] w-1.5 h-1.5 rounded-full bg-[#e5e5e5]"></span>
+      <span class="city-star absolute top-12 left-[89%] w-1 h-1 rounded-full bg-[#a3a3a3] animate-ping" style="animation-duration: 4.2s;"></span>
+    </div>
+
+    <!-- Cyber Moon -->
+    <div
+      id="city-moon"
+      class="pointer-events-none absolute top-7 right-10 sm:right-20 w-12 h-12 rounded-full border border-[#a3a3a3]/40 bg-gradient-to-br from-[#e5e5e5]/20 to-transparent shadow-[0_0_40px_rgba(229,229,229,0.18)] transition-all duration-700"
+    ></div>
+
+    <!-- Interactive Cursor Searchlights -->
+    <div
+      id="city-searchlight-1"
+      class="pointer-events-none absolute bottom-0 left-[22%] w-24 h-80 origin-bottom bg-gradient-to-t from-[#e5e5e5]/12 via-[#a3a3a3]/4 to-transparent blur-md transition-opacity duration-500"
+      style="transform: rotate(-18deg);"
+    ></div>
+    <div
+      id="city-searchlight-2"
+      class="pointer-events-none absolute bottom-0 right-[22%] w-24 h-80 origin-bottom bg-gradient-to-t from-[#e5e5e5]/12 via-[#a3a3a3]/4 to-transparent blur-md transition-opacity duration-500"
+      style="transform: rotate(18deg);"
+    ></div>
+
+    <!-- Autonomous Flying Cyber Drones (Active only before impact) -->
+    <div id="city-drones" class="pointer-events-none absolute inset-0 overflow-hidden transition-opacity duration-500">
+      <div class="city-drone-left absolute top-16 left-0 flex items-center gap-1">
+        <span class="w-4 h-[2px] bg-[#e5e5e5] shadow-[0_0_8px_#fff]"></span>
+        <span class="w-1 h-1 rounded-full bg-[#a3a3a3]"></span>
+      </div>
+      <div class="city-drone-right absolute top-24 right-0 flex items-center gap-1">
+        <span class="w-1 h-1 rounded-full bg-[#a3a3a3]"></span>
+        <span class="w-5 h-[2px] bg-[#a3a3a3] shadow-[0_0_8px_#a3a3a3]"></span>
+      </div>
+    </div>
+
+    <!-- SKYLINE ROW (Left Wing + Center Impact Target + Right Wing) -->
+    <div class="relative z-10 w-full px-2 sm:px-8 flex items-end justify-between gap-1 sm:gap-2">
+      <!-- Left Wing Buildings -->
+      <div class="flex items-end gap-1 sm:gap-2">
+        {leftBuildings.map((b) => (
+          <div class={`city-building ${b.width} ${b.height} bg-[#0d0d0d] border-t border-x border-[#262626] p-1.5 sm:p-2 flex flex-col justify-between transition-all duration-300 hover:border-[#a3a3a3]/50`}>
+            <div class="grid gap-1 sm:gap-1.5 h-full" style={`grid-template-columns: repeat(${b.cols}, minmax(0, 1fr));`}>
+              {Array.from({ length: b.cols * b.rows }).map((_, idx) => (
+                <span
+                  class={`city-window rounded-[1px] transition-all duration-200 cursor-pointer ${
+                    (idx * 7) % 3 === 0 ? 'is-lit bg-[#d4d4d4]/80 shadow-[0_0_8px_#d4d4d488]' : 'bg-[#1a1a1a]'
+                  }`}
+                ></span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- CENTER IMPACT ZONE (Intact Central Towers -> Destroyed Crater & Game Portal Marker) -->
+      <div id="footer-impact-target" class="relative flex flex-col items-center justify-end min-w-[170px] sm:min-w-[260px]">
+        <!-- 1. Intact Center Skyline (Visible BEFORE crash) -->
+        <div id="city-center-intact" class="flex items-end justify-center gap-1 sm:gap-2 transition-all duration-300">
+          {centerBuildings.map((b) => (
+            <div class={`city-building relative ${b.width} ${b.height} bg-[#0e0e0e] border-t border-x border-[#2e2e2e] p-1.5 sm:p-2.5 flex flex-col justify-between transition-all duration-300 hover:border-[#e5e5e5]/60`}>
+              {b.isMainTower && (
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#e5e5e5] animate-ping"></span>
+                  <span class="w-[1px] h-5 bg-[#a3a3a3]"></span>
+                </div>
+              )}
+              <div class="grid gap-1 sm:gap-1.5 h-full" style={`grid-template-columns: repeat(${b.cols}, minmax(0, 1fr));`}>
+                {Array.from({ length: b.cols * b.rows }).map((_, idx) => (
+                  <span
+                    class={`city-window rounded-[1px] transition-all duration-200 cursor-pointer ${
+                      (idx * 5) % 2 === 0 ? 'is-lit bg-[#e5e5e5]/85 shadow-[0_0_8px_#e5e5e588]' : 'bg-[#1a1a1a]'
+                    }`}
+                  ></span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <!-- 2. Destroyed Crater, Police Crime Scene & Game Entry Marker (Visible AFTER Rocket Crash) -->
+        <div
+          id="city-center-destroyed"
+          class="hidden flex-col items-center justify-end w-full pt-0 pb-0 relative z-30 translate-y-3.5 sm:translate-y-4"
+        >
+          <!-- GAME-STYLE FLOATING ENTRY MARKER ABOVE THE BREACH HOLE (ICON ONLY) -->
+          <a
+            id="secret-entry-marker"
+            href="/secret"
+            class="group relative z-40 mb-0 flex flex-col items-center cursor-pointer pointer-events-auto animate-bounce"
+            aria-label="Enter"
+          >
+            <!-- Glowing Game Quest Diamond / Downward Entry Indicator -->
+            <div class="relative flex items-center justify-center w-8 h-8">
+              <span class="absolute inset-0 rounded-full border border-[#e5e5e5]/50 animate-ping"></span>
+              <div class="w-7 h-7 rotate-45 rounded-[3px] border-2 border-[#e5e5e5] bg-[#0a0a0a] flex items-center justify-center shadow-[0_0_20px_#e5e5e5] group-hover:bg-[#e5e5e5] group-hover:scale-115 transition-all duration-300">
+                <svg class="w-3.5 h-3.5 -rotate-45 text-[#e5e5e5] group-hover:text-[#0a0a0a] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+              </div>
+            </div>
+          </a>
+
+          <!-- Central Crater & Broken Building Stumps -->
+          <div class="relative w-56 sm:w-72 h-14 flex items-end justify-center">
+            <!-- Rising Smoke from Crater -->
+            <div class="pointer-events-none absolute -top-4 inset-x-6 h-14 bg-gradient-to-t from-[#e5e5e5]/20 via-[#a3a3a3]/10 to-transparent blur-xl animate-pulse"></div>
+
+            <svg class="w-full h-14 overflow-visible" viewBox="0 0 280 80" fill="none">
+              <!-- Left shattered wall stump -->
+              <polygon points="12,80 12,28 24,38 36,22 48,46 62,40 74,80" fill="#121212" stroke="#404040" stroke-width="1.5" />
+              <!-- Right shattered wall stump -->
+              <polygon points="206,80 216,36 228,46 242,20 254,34 268,24 268,80" fill="#121212" stroke="#404040" stroke-width="1.5" />
+              <!-- Central Deep Breach Abyss Hole -->
+              <ellipse cx="140" cy="74" rx="70" ry="14" fill="#000000" stroke="#a3a3a3" stroke-width="1.5" stroke-dasharray="5 3" />
+              <ellipse cx="140" cy="74" rx="50" ry="9" fill="#e5e5e5" fill-opacity="0.18" />
+              <!-- Cracks radiating from hole -->
+              <path d="M72 74 L46 84 M208 74 L236 84 M112 78 L98 90 M168 78 L184 90" stroke="#737373" stroke-width="1.5" />
+            </svg>
+          </div>
+
+          <!-- CRIME SCENE INVESTIGATION & PRESS SCENE (Surrounding the hole) -->
+          <div class="relative w-full max-w-2xl px-1 sm:px-4 pt-1 flex flex-col items-center">
+            <!-- POLICE LINE TAPE (Themed Monochrome Barrier Tape) -->
+            <div class="relative w-full flex items-center justify-between mb-1">
+              <!-- Left Barrier Post -->
+              <div class="flex flex-col items-center">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#e5e5e5] shadow-[0_0_6px_#fff]"></span>
+                <span class="w-0.5 h-4 bg-[#737373]"></span>
+              </div>
+
+              <!-- Monochrome Police Line Tape Banner -->
+              <div class="flex-1 mx-1.5 relative h-2.5 rounded-sm overflow-hidden border border-[#525252] shadow-sm flex items-center justify-center police-tape-bar">
+                <span class="text-[7px] sm:text-[8px] font-mono font-bold tracking-widest text-[#0a0a0a] bg-white/90 px-2 py-0.5 uppercase whitespace-nowrap">
+                  POLICE LINE &bull; DO NOT CROSS &bull; CRIME SCENE TKP &bull; VASKRONA IMPACT ZONE
+                </span>
+              </div>
+
+              <!-- Right Barrier Post -->
+              <div class="flex flex-col items-center">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#e5e5e5] shadow-[0_0_6px_#fff]"></span>
+                <span class="w-0.5 h-4 bg-[#737373]"></span>
+              </div>
+            </div>
+
+            <!-- DETAILED GROUND SCENE: POLICE CRUISER, INVESTIGATORS, PRESS & BYSTANDERS -->
+            <div class="w-full flex items-end justify-between gap-1 sm:gap-4 text-[9px] font-mono">
+              <!-- LEFT AREA: POLICE SQUAD CAR & CRIME SCENE INVESTIGATORS (INSIDE TAPE) -->
+              <div class="flex items-end gap-1.5 sm:gap-2.5">
+                <!-- Mini Police Cruiser -->
+                <div class="flex flex-col items-center">
+                  <!-- Strobe Lightbar on Car Roof -->
+                  <div class="flex items-center gap-0.5 -mb-0.5 z-10">
+                    <span class="w-1.5 h-1 rounded-sm bg-white police-siren-left"></span>
+                    <span class="w-1 h-0.5 bg-[#525252]"></span>
+                    <span class="w-1.5 h-1 rounded-sm bg-[#d4d4d4] police-siren-right"></span>
+                  </div>
+                  <!-- Police Car Body -->
+                  <div class="relative w-12 sm:w-16 h-4 rounded-t-[3px] bg-[#111111] border border-[#e5e5e5]/80 flex flex-col justify-between px-1 shadow-[0_0_12px_rgba(255,255,255,0.2)]">
+                    <div class="flex items-center justify-between text-[6px] font-mono text-[#e5e5e5] tracking-tighter pt-0.5">
+                      <span>NCPD</span>
+                      <span class="text-[5px] text-[#a3a3a3]">#09</span>
+                    </div>
+                    <!-- Wheels & Headlights -->
+                    <div class="flex items-center justify-between -mb-[2px]">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#0a0a0a] border border-[#737373]"></span>
+                      <!-- Headlight beam pointing toward crater -->
+                      <span class="w-5 h-1.5 bg-gradient-to-r from-white/70 to-transparent blur-[0.5px]"></span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#0a0a0a] border border-[#737373]"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Investigator 1: Detective with flashlight scanning the crater -->
+                <div class="flex flex-col items-center relative pb-0.5">
+                  <div class="flex flex-col items-center">
+                    <!-- Police Hat -->
+                    <span class="w-2 h-0.5 bg-[#e5e5e5] rounded-t-sm"></span>
+                    <!-- Head -->
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#d4d4d4]"></span>
+                    <!-- Body with Badge -->
+                    <div class="w-2.5 h-3 bg-[#1c1c1c] border border-[#525252] rounded-t-[1px] flex items-center justify-center">
+                      <span class="w-0.5 h-0.5 rounded-full bg-white"></span>
+                    </div>
+                  </div>
+                  <!-- Flashlight Beam Sweeping Crater (Ramping & Fokus) -->
+                  <div class="police-flashlight absolute top-1.5 left-2 w-6 sm:w-7 h-1.5 bg-gradient-to-r from-white/90 via-[#e5e5e5]/35 to-transparent blur-[0.4px] pointer-events-none rounded-r-full"></div>
+                </div>
+
+                <!-- Investigator 2: Forensic Tech inspecting debris -->
+                <div class="hidden sm:flex flex-col items-center pb-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#a3a3a3]"></span>
+                  <div class="w-2.5 h-3 bg-[#161616] border border-[#404040] rounded-t-[1px] flex flex-col items-center justify-center">
+                    <!-- Mini scanner tablet -->
+                    <span class="w-1 h-0.5 bg-[#e5e5e5] shadow-[0_0_4px_#fff]"></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- RIGHT AREA: SPOKESPERSON POLICE, TV NEWS CREW & CROWD (OUTSIDE TAPE) -->
+              <div class="flex items-end gap-1.5 sm:gap-3">
+                <!-- Police Spokesperson being interviewed -->
+                <div class="flex flex-col items-center pb-0.5">
+                  <span class="w-2 h-0.5 bg-[#e5e5e5] rounded-t-sm"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#d4d4d4]"></span>
+                  <div class="w-2.5 h-3 bg-[#1c1c1c] border border-[#737373] rounded-t-[1px]"></div>
+                </div>
+
+                <!-- TV News Reporter with Microphone -->
+                <div class="flex flex-col items-center relative pb-0.5">
+                  <!-- Live Breaking News Badge -->
+                  <span class="absolute -top-3.5 -left-3 text-[6px] font-mono text-[#0a0a0a] bg-white font-bold px-1 rounded-[2px] shadow-[0_0_6px_#fff] whitespace-nowrap animate-pulse">
+                    &bull; LIVE NEWS
+                  </span>
+                  <!-- Reporter Head -->
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#e5e5e5]"></span>
+                  <!-- Body & Extended Mic Arm -->
+                  <div class="relative w-2.5 h-3 bg-[#262626] border border-[#737373] rounded-t-[1px]">
+                    <!-- Mic pointing to officer -->
+                    <span class="absolute -left-1.5 top-0.5 w-1.5 h-[1.5px] bg-[#d4d4d4]"></span>
+                    <span class="absolute -left-2 top-0 w-1 h-1 rounded-full bg-white shadow-[0_0_4px_#fff]"></span>
+                  </div>
+                </div>
+
+                <!-- TV Cameraman with Shoulder Cam & Red Tally Light -->
+                <div class="flex flex-col items-center pb-0.5">
+                  <!-- Shoulder Camera Box -->
+                  <div class="flex items-center -mb-0.5">
+                    <span class="w-2.5 h-1.5 bg-[#0a0a0a] border border-[#a3a3a3] rounded-sm flex items-center justify-between px-0.5">
+                      <span class="w-0.5 h-0.5 rounded-full bg-white animate-ping"></span>
+                      <span class="w-0.5 h-0.5 bg-[#737373]"></span>
+                    </span>
+                  </div>
+                  <!-- Cameraman Silhouette -->
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#a3a3a3]"></span>
+                  <div class="w-2.5 h-3 bg-[#161616] border border-[#404040]"></div>
+                </div>
+
+                <!-- Crowd of Bystanders Watching & Taking Photos -->
+                <div class="flex items-end gap-0.5 relative pb-0.5">
+                  <!-- Bystander 1 -->
+                  <div class="flex flex-col items-center">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#737373]"></span>
+                    <div class="w-2 h-2.5 bg-[#141414] border border-[#333333]"></div>
+                  </div>
+
+                  <!-- Bystander 2 (Photographer with Camera Flash) -->
+                  <div class="flex flex-col items-center relative">
+                    <!-- Phone Camera Flash Burst -->
+                    <div class="camera-flash-fx pointer-events-none absolute -top-4 -left-2 w-5 h-5 rounded-full bg-white blur-[2px]"></div>
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#a3a3a3]"></span>
+                    <div class="w-2 h-2.5 bg-[#1a1a1a] border border-[#525252] flex items-center justify-center">
+                      <span class="w-1 h-0.5 bg-white shadow-[0_0_4px_#fff]"></span>
+                    </div>
+                  </div>
+
+                  <!-- Bystander 3 (Whispering / Watching) -->
+                  <div class="hidden sm:flex flex-col items-center">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#737373]"></span>
+                    <div class="w-2 h-2.5 bg-[#141414] border border-[#333333]"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Wing Buildings -->
+      <div class="flex items-end gap-1 sm:gap-2">
+        {rightBuildings.map((b) => (
+          <div class={`city-building ${b.width} ${b.height} bg-[#0d0d0d] border-t border-x border-[#262626] p-1.5 sm:p-2 flex flex-col justify-between transition-all duration-300 hover:border-[#a3a3a3]/50`}>
+            <div class="grid gap-1 sm:gap-1.5 h-full" style={`grid-template-columns: repeat(${b.cols}, minmax(0, 1fr));`}>
+              {Array.from({ length: b.cols * b.rows }).map((_, idx) => (
+                <span
+                  class={`city-window rounded-[1px] transition-all duration-200 cursor-pointer ${
+                    (idx * 11) % 3 === 0 ? 'is-lit bg-[#d4d4d4]/80 shadow-[0_0_8px_#d4d4d488]' : 'bg-[#1a1a1a]'
+                  }`}
+                ></span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- BUSY NIGHT CITY SIDEWALK (PEDESTRIANS) & TWO-LANE HIGHWAY (MINI CARS) -->
+    <div id="city-street-traffic" class="relative z-20 w-full h-7 bg-[#0d0d0d] border-t border-[#333333] overflow-hidden transition-opacity duration-500">
+      <!-- Streetlamps along the sidewalk -->
+      <div class="pointer-events-none absolute -top-3 inset-x-0 flex justify-around px-8">
+        {[1, 2, 3, 4, 5, 6].map(() => (
+          <div class="flex flex-col items-center">
+            <span class="w-2 h-0.5 rounded-full bg-[#e5e5e5] shadow-[0_2px_8px_#e5e5e5]"></span>
+            <span class="w-[1px] h-3 bg-[#404040]"></span>
+          </div>
+        ))}
+      </div>
+
+      <!-- 1. Sidewalk Layer: Pedestrians walking left & right -->
+      <div class="relative w-full h-2.5 border-b border-[#222222] bg-[#141414]">
+        <!-- Pedestrians walking Right -->
+        {[
+          { dur: '22s', delay: '-2s' },
+          { dur: '28s', delay: '-9s' },
+          { dur: '25s', delay: '-16s' },
+          { dur: '31s', delay: '-23s' },
+          { dur: '20s', delay: '-5s' },
+        ].map((p) => (
+          <div class="city-ped-right bottom-0.5" style={`--dur: ${p.dur}; --delay: ${p.delay};`}>
+            <div class="ped-body flex flex-col items-center">
+              <span class="w-1 h-1 rounded-full bg-[#d4d4d4]"></span>
+              <span class="w-[3px] h-1.5 bg-[#a3a3a3] rounded-[1px]"></span>
+            </div>
+          </div>
+        ))}
+
+        <!-- Pedestrians walking Left -->
+        {[
+          { dur: '24s', delay: '-4s' },
+          { dur: '29s', delay: '-12s' },
+          { dur: '21s', delay: '-19s' },
+          { dur: '27s', delay: '-7s' },
+          { dur: '33s', delay: '-15s' },
+        ].map((p) => (
+          <div class="city-ped-left bottom-0.5" style={`--dur: ${p.dur}; --delay: ${p.delay};`}>
+            <div class="ped-body flex flex-col items-center">
+              <span class="w-1 h-1 rounded-full bg-[#e5e5e5]"></span>
+              <span class="w-[3px] h-1.5 bg-[#737373] rounded-[1px]"></span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Dashed Road Center Line -->
+      <div class="absolute bottom-2 inset-x-0 h-[1px] border-b border-dashed border-[#333333]/80"></div>
+
+      <!-- 2. Road Traffic Layer: Mini Cars Driving Eastbound (Left -> Right) -->
+      {[
+        { dur: '6.5s', delay: '-1s', w: 'w-5' },
+        { dur: '8.5s', delay: '-4.2s', w: 'w-6' },
+        { dur: '5.4s', delay: '-2.7s', w: 'w-4' },
+        { dur: '9.8s', delay: '-6.5s', w: 'w-5' },
+      ].map((car) => (
+        <div class="city-car-right bottom-[1px] flex items-center" style={`--dur: ${car.dur}; --delay: ${car.delay};`}>
+          <!-- Taillight trail -->
+          <span class="w-3 h-[2px] bg-gradient-to-l from-[#a3a3a3] to-transparent"></span>
+          <!-- Mini Car Chassis -->
+          <div class={`relative ${car.w} h-2 rounded-t-[3px] bg-[#d4d4d4] border border-[#262626] flex items-end justify-between px-0.5 shadow-[0_0_6px_#e5e5e566]`}>
+            <span class="w-1 h-1 rounded-full bg-[#0a0a0a] -mb-[1px]"></span>
+            <span class="w-1 h-1 rounded-full bg-[#0a0a0a] -mb-[1px]"></span>
+          </div>
+          <!-- Headlight beam -->
+          <span class="w-6 h-1.5 bg-gradient-to-r from-white/75 to-transparent blur-[0.5px]"></span>
+        </div>
+      ))}
+
+      <!-- 3. Road Traffic Layer: Mini Cars Driving Westbound (Right -> Left) -->
+      {[
+        { dur: '7.2s', delay: '-0.5s', w: 'w-5' },
+        { dur: '5.8s', delay: '-3.4s', w: 'w-4' },
+        { dur: '9.1s', delay: '-5.8s', w: 'w-6' },
+        { dur: '7.9s', delay: '-2.1s', w: 'w-5' },
+      ].map((car) => (
+        <div class="city-car-left bottom-[7px] flex items-center" style={`--dur: ${car.dur}; --delay: ${car.delay};`}>
+          <!-- Headlight beam -->
+          <span class="w-6 h-1.5 bg-gradient-to-l from-white/75 to-transparent blur-[0.5px]"></span>
+          <!-- Mini Car Chassis -->
+          <div class={`relative ${car.w} h-2 rounded-t-[3px] bg-[#a3a3a3] border border-[#1a1a1a] flex items-end justify-between px-0.5 shadow-[0_0_6px_#a3a3a366]`}>
+            <span class="w-1 h-1 rounded-full bg-[#0a0a0a] -mb-[1px]"></span>
+            <span class="w-1 h-1 rounded-full bg-[#0a0a0a] -mb-[1px]"></span>
+          </div>
+          <!-- Taillight trail -->
+          <span class="w-3 h-[2px] bg-gradient-to-r from-[#737373] to-transparent"></span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Footer Bottom Info Row (Split around center when destroyed) -->
+  <div id="footer-bottom-bar" class="px-6 py-8 lg:px-12 border-t border-[#262626] bg-[#0a0a0a] flex flex-col md:flex-row items-center justify-between gap-6 relative z-20 transition-all duration-500">
     <div class="flex items-center gap-3">
       <a href="#home" class="flex items-center gap-2 text-xl font-black font-display tracking-tight hover:scale-105 transition-transform">
         <img src="/logo_vaskrona.png" alt="Hilmi Logo" class="w-6 h-6 object-contain logo-glow" />
@@ -15,7 +431,7 @@
       <span class="text-xs font-mono text-[#525252]">DESIGN ENGINEER PORTFOLIO</span>
     </div>
 
-    <div class="flex items-center gap-5">
+    <div id="footer-center-socials" class="flex items-center gap-5 transition-all duration-500">
       <a href="https://linkedin.com" target="_blank" class="text-[#525252] hover:text-[#e5e5e5] transition-colors duration-300" aria-label="LinkedIn">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
       </a>
@@ -33,3 +449,101 @@
     <p class="text-xs text-[#525252] font-mono">&copy; 2025 Hilmi Zaki R. All rights reserved.</p>
   </div>
 </footer>
+
+<script>
+  const footerRoot = document.getElementById('footer-root');
+  const cityScene = document.getElementById('night-city-scene');
+  const searchlight1 = document.getElementById('city-searchlight-1');
+  const searchlight2 = document.getElementById('city-searchlight-2');
+  const cityWindows = document.querySelectorAll('.city-window');
+  const cityCenterIntact = document.getElementById('city-center-intact');
+  const cityCenterDestroyed = document.getElementById('city-center-destroyed');
+  const cityStatusText = document.getElementById('city-status-text');
+  const cityHintText = document.getElementById('city-hint-text');
+  const cityPowerDot = document.getElementById('city-power-dot');
+  const footerCenterSocials = document.getElementById('footer-center-socials');
+
+  let isCityDestroyed = false;
+
+  // Interactive Night City: Hovering/Clicking windows & moving searchlights with cursor
+  cityWindows.forEach((win) => {
+    win.addEventListener('mouseenter', () => {
+      if (isCityDestroyed) return;
+      win.classList.add('is-lit', 'bg-[#e5e5e5]', 'shadow-[0_0_10px_#e5e5e5]');
+      win.classList.remove('bg-[#1a1a1a]');
+    });
+
+    win.addEventListener('click', () => {
+      if (isCityDestroyed) return;
+      if (win.classList.contains('is-lit')) {
+        win.classList.remove('is-lit', 'bg-[#e5e5e5]', 'bg-[#d4d4d4]/80', 'bg-[#e5e5e5]/85', 'shadow-[0_0_10px_#e5e5e5]', 'shadow-[0_0_8px_#d4d4d488]', 'shadow-[0_0_8px_#e5e5e588]');
+        win.classList.add('bg-[#1a1a1a]');
+      } else {
+        win.classList.add('is-lit', 'bg-[#e5e5e5]', 'shadow-[0_0_10px_#e5e5e5]');
+        win.classList.remove('bg-[#1a1a1a]');
+      }
+    });
+  });
+
+  cityScene?.addEventListener('mousemove', (e) => {
+    if (isCityDestroyed) return;
+    const rect = cityScene.getBoundingClientRect();
+    const relX = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
+    const angle1 = relX * 55 - 10;
+    const angle2 = relX * 55 + 10;
+    if (searchlight1) searchlight1.style.transform = `rotate(${angle1.toFixed(1)}deg)`;
+    if (searchlight2) searchlight2.style.transform = `rotate(${angle2.toFixed(1)}deg)`;
+  });
+
+  // Ambient random window twinkle while Night City is intact
+  const cityTwinkleInterval = setInterval(() => {
+    if (isCityDestroyed || cityWindows.length === 0) return;
+    const randIndex = Math.floor(Math.random() * cityWindows.length);
+    const win = cityWindows[randIndex];
+    win.classList.toggle('opacity-40');
+  }, 350);
+
+  // Listen for the Rocket Impact event from the Hero Cutscene!
+  window.addEventListener('vaskrona:footer-crash', () => {
+    isCityDestroyed = true;
+    clearInterval(cityTwinkleInterval);
+
+    footerRoot?.classList.add('is-destroyed');
+
+    // Swap intact central towers with the breached crater + game portal marker
+    cityCenterIntact?.classList.add('hidden');
+    cityCenterDestroyed?.classList.remove('hidden');
+    cityCenterDestroyed?.classList.add('flex');
+
+    // Damage the center of the bottom footer bar too
+    if (footerCenterSocials) {
+      footerCenterSocials.innerHTML = `<span class="text-[11px] font-mono text-[#737373] line-through tracking-widest">[ SECTOR BREACHED // OFFLINE ]</span>`;
+    }
+
+    // Shut down all Night City lights & interactivity (Power Blackout)
+    cityWindows.forEach((win) => {
+      win.classList.remove(
+        'is-lit',
+        'bg-[#e5e5e5]',
+        'bg-[#d4d4d4]/80',
+        'bg-[#e5e5e5]/85',
+        'shadow-[0_0_10px_#e5e5e5]',
+        'shadow-[0_0_8px_#d4d4d488]',
+        'shadow-[0_0_8px_#e5e5e588]',
+        'cursor-pointer'
+      );
+      win.classList.add('bg-[#141414]', 'cursor-default');
+    });
+
+    if (cityStatusText) {
+      cityStatusText.textContent = 'NIGHT CITY // CRITICAL IMPACT DETECTED — POWER OFFLINE';
+    }
+    if (cityHintText) {
+      cityHintText.textContent = 'BREACH OPENED // CLICK PORTAL MARKER TO ENTER';
+    }
+    if (cityPowerDot) {
+      cityPowerDot.classList.remove('animate-pulse', 'bg-[#e5e5e5]');
+      cityPowerDot.classList.add('bg-[#525252]');
+    }
+  });
+</script>

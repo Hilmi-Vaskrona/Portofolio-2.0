@@ -118,6 +118,15 @@ import '../styles/global.css';
     }
     requestAnimationFrame(raf);
 
+    // Pause/resume Lenis during Vaskrona Rocket Cutscene
+    window.addEventListener('vaskrona:cutscene-lock', (e: any) => {
+      if (e.detail?.locked) {
+        lenis.stop();
+      } else {
+        lenis.start();
+      }
+    });
+
     // 2. Guglieri.com & Chanhdai.com Cursor-Tracking Spotlight Cards
     function initSpotlightCards() {
       const cards = document.querySelectorAll('.spotlight-card');

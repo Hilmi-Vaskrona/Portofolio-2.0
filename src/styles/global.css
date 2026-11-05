@@ -645,3 +645,210 @@ h1, h2, h3, .font-display {
   transform: rotateY(180deg) translateZ(2px);
 }
 
+/* =========================================================
+   6. NIGHT CITY FOOTER & ROCKET CUTSCENE SYSTEM
+   ========================================================= */
+@keyframes flyDroneRight {
+  0% { transform: translateX(-80px) translateY(0px); }
+  50% { transform: translateX(50vw) translateY(-8px); }
+  100% { transform: translateX(105vw) translateY(4px); }
+}
+
+@keyframes flyDroneLeft {
+  0% { transform: translateX(80px) translateY(0px); }
+  50% { transform: translateX(-50vw) translateY(6px); }
+  100% { transform: translateX(-105vw) translateY(-4px); }
+}
+
+.city-drone-left {
+  animation: flyDroneRight 11s linear infinite;
+}
+
+.city-drone-right {
+  animation: flyDroneLeft 14s linear infinite;
+}
+
+/* Night City Pedestrians & Mini Cars */
+@keyframes driveRight {
+  0% { transform: translateX(-120px); }
+  100% { transform: translateX(calc(100vw + 120px)); }
+}
+
+@keyframes driveLeft {
+  0% { transform: translateX(120px); }
+  100% { transform: translateX(calc(-100vw - 120px)); }
+}
+
+@keyframes walkRight {
+  0% { transform: translateX(-40px); }
+  100% { transform: translateX(calc(100vw + 40px)); }
+}
+
+@keyframes walkLeft {
+  0% { transform: translateX(40px); }
+  100% { transform: translateX(calc(-100vw - 40px)); }
+}
+
+@keyframes pedestrianStep {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-2px); }
+}
+
+.city-car-right {
+  position: absolute;
+  left: 0;
+  animation: driveRight var(--dur, 8s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.city-car-left {
+  position: absolute;
+  right: 0;
+  animation: driveLeft var(--dur, 9s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.city-ped-right {
+  position: absolute;
+  left: 0;
+  animation: walkRight var(--dur, 24s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.city-ped-left {
+  position: absolute;
+  right: 0;
+  animation: walkLeft var(--dur, 26s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.ped-body {
+  animation: pedestrianStep 0.38s ease-in-out infinite;
+}
+
+/* Disable Night City lights, drones, searchlights, cars & pedestrians when destroyed */
+#footer-root.is-destroyed #city-searchlight-1,
+#footer-root.is-destroyed #city-searchlight-2,
+#footer-root.is-destroyed #city-drones,
+#footer-root.is-destroyed #city-street-traffic {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+#footer-root.is-destroyed #city-stars {
+  opacity: 0.2;
+}
+
+#footer-root.is-destroyed .city-building {
+  pointer-events: none;
+  border-color: #1f1f1f !important;
+}
+
+/* Lock all page interactions during cutscene */
+body.cutscene-locked {
+  overflow: hidden !important;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+body.cutscene-locked #navbar-wrapper {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Screen shake upon rocket impact */
+@keyframes impactScreenShake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  10% { transform: translate3d(-14px, -10px, 0) rotate(-0.8deg); }
+  20% { transform: translate3d(14px, 12px, 0) rotate(0.8deg); }
+  30% { transform: translate3d(-12px, 8px, 0) rotate(-0.5deg); }
+  40% { transform: translate3d(10px, -10px, 0) rotate(0.5deg); }
+  55% { transform: translate3d(-8px, 6px, 0); }
+  70% { transform: translate3d(6px, -4px, 0); }
+  85% { transform: translate3d(-3px, 2px, 0); }
+}
+
+body.impact-shaking {
+  animation: impactScreenShake 0.75s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Rocket Thruster Flame Flicker */
+@keyframes thrusterFlame {
+  0%, 100% { transform: scaleY(1) scaleX(1); opacity: 0.95; }
+  50% { transform: scaleY(1.38) scaleX(0.86); opacity: 1; }
+}
+
+.rocket-flame {
+  animation: thrusterFlame 0.09s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+/* Speed lines during high-speed dive */
+@keyframes speedLineScroll {
+  0% { transform: translateY(100%); opacity: 0; }
+  30% { opacity: 0.65; }
+  100% { transform: translateY(-120%); opacity: 0; }
+}
+
+.speed-line {
+  animation: speedLineScroll 0.35s linear infinite;
+}
+
+/* =========================================================
+   7. POST-IMPACT POLICE CRIME SCENE & INVESTIGATION
+   ========================================================= */
+@keyframes policeStrobeA {
+  0%, 15%, 30% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 10px #ffffff); }
+  8%, 22% { opacity: 0.15; transform: scale(0.9); filter: none; }
+  35%, 100% { opacity: 0.1; transform: scale(0.85); filter: none; }
+}
+
+@keyframes policeStrobeB {
+  0%, 45% { opacity: 0.1; transform: scale(0.85); filter: none; }
+  50%, 65%, 80% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 10px #d4d4d4); }
+  58%, 72% { opacity: 0.15; transform: scale(0.9); filter: none; }
+  85%, 100% { opacity: 0.1; transform: scale(0.85); filter: none; }
+}
+
+.police-siren-left {
+  animation: policeStrobeA 0.75s ease-in-out infinite;
+}
+
+.police-siren-right {
+  animation: policeStrobeB 0.75s ease-in-out infinite;
+}
+
+@keyframes cameraFlashPaparazzi {
+  0%, 88%, 100% { opacity: 0; }
+  90% { opacity: 1; }
+  92% { opacity: 0.1; }
+  94% { opacity: 0.9; }
+  96% { opacity: 0; }
+}
+
+.camera-flash-fx {
+  animation: cameraFlashPaparazzi 3.6s infinite ease-out;
+}
+
+@keyframes flashlightSweep {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(6deg); }
+}
+
+.police-flashlight {
+  animation: flashlightSweep 3.5s ease-in-out infinite;
+  transform-origin: left center;
+}
+
+.police-tape-bar {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #111111 0px,
+    #111111 12px,
+    #e5e5e5 12px,
+    #e5e5e5 24px
+  );
+}
+
+
+

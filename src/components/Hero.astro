@@ -226,9 +226,10 @@ const hilmiChars = ['H', 'i', 'l', 'm', 'i'];
                   <circle cx="50" cy="50" r="46" stroke="currentColor" stroke-width="0.75" stroke-dasharray="3 5" />
                 </svg>
                 <img
+                  id="vaskrona-back-img"
                   src="/logo_vaskrona.png"
                   alt="Logo Vaskrona"
-                  class="w-28 h-28 object-contain logo-glow transition-transform duration-500 group-hover:scale-110"
+                  class="w-28 h-28 object-contain logo-glow transition-all duration-300 group-hover:scale-110"
                 />
               </div>
             </div>
@@ -251,6 +252,80 @@ const hilmiChars = ['H', 'i', 'l', 'm', 'i'];
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ROCKET CUTSCENE OVERLAY (Fixed POV Camera Lock) -->
+  <div id="rocket-cutscene-overlay" class="fixed inset-0 z-[9500] hidden pointer-events-auto overflow-hidden select-none">
+    <!-- Top & Bottom Cinematic Letterbox Bars -->
+    <div id="cutscene-bar-top" class="absolute top-0 inset-x-0 h-14 sm:h-16 bg-black border-b border-[#333333] z-30 flex items-center justify-between px-6 font-mono text-[11px] text-[#a3a3a3] -translate-y-full transition-transform duration-500">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-[#e5e5e5] animate-ping"></span>
+        <span>CUTSCENE // VASKRONA DESCENT PROTOCOL</span>
+      </div>
+      <span>CAMERA POV: LOCKED</span>
+    </div>
+
+    <div id="cutscene-bar-bottom" class="absolute bottom-0 inset-x-0 h-14 sm:h-16 bg-black border-t border-[#333333] z-30 flex items-center justify-between px-6 font-mono text-[11px] text-[#737373] translate-y-full transition-transform duration-500">
+      <span id="cutscene-telemetry">TARGET: NIGHT CITY FOOTER [CENTER SECTOR]</span>
+      <span id="cutscene-altitude">ALTITUDE: 100%</span>
+    </div>
+
+    <!-- High-Speed Vertical Speedlines -->
+    <div id="cutscene-speedlines" class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300">
+      <span class="speed-line absolute left-[12%] top-0 w-[1px] h-44 bg-gradient-to-b from-transparent via-[#e5e5e5]/60 to-transparent" style="animation-delay: 0ms;"></span>
+      <span class="speed-line absolute left-[28%] top-0 w-[1.5px] h-64 bg-gradient-to-b from-transparent via-[#a3a3a3]/50 to-transparent" style="animation-delay: 110ms;"></span>
+      <span class="speed-line absolute left-[46%] top-0 w-[1px] h-52 bg-gradient-to-b from-transparent via-[#e5e5e5]/40 to-transparent" style="animation-delay: 210ms;"></span>
+      <span class="speed-line absolute left-[64%] top-0 w-[1.5px] h-60 bg-gradient-to-b from-transparent via-[#e5e5e5]/60 to-transparent" style="animation-delay: 60ms;"></span>
+      <span class="speed-line absolute left-[83%] top-0 w-[1px] h-48 bg-gradient-to-b from-transparent via-[#a3a3a3]/50 to-transparent" style="animation-delay: 160ms;"></span>
+    </div>
+
+    <!-- Vaskrona Rocket Actor -->
+    <div
+      id="vaskrona-rocket-actor"
+      class="pointer-events-none fixed top-0 left-0 z-40 w-36 h-48 -ml-[72px] -mt-[96px] flex flex-col items-center justify-center will-change-transform"
+    >
+      <!-- Targeting HUD Ring around Rocket -->
+      <div class="absolute inset-0 rounded-full border border-dashed border-[#e5e5e5]/35 kinetic-spin"></div>
+
+      <!-- Rocket Chassis + Vaskrona Emblem Core -->
+      <div id="vaskrona-rocket-body" class="relative flex flex-col items-center">
+        <!-- Aerodynamic Rocket Nose Cone & Fins SVG -->
+        <svg class="w-28 h-36 overflow-visible drop-shadow-[0_0_25px_rgba(229,229,229,0.45)]" viewBox="0 0 120 150" fill="none">
+          <!-- Left & Right Wing Fins -->
+          <polygon points="24,88 2,126 30,114" fill="#1a1a1a" stroke="#e5e5e5" stroke-width="1.5" />
+          <polygon points="96,88 118,126 90,114" fill="#1a1a1a" stroke="#e5e5e5" stroke-width="1.5" />
+          <!-- Main Rocket Fuselage -->
+          <path d="M60 6 C84 34 94 68 92 114 L28 114 C26 68 36 34 60 6 Z" fill="#0e0e0e" stroke="#e5e5e5" stroke-width="2" />
+          <!-- Inner Fuselage Tech Lines -->
+          <path d="M60 6 L60 28 M36 52 L84 52 M32 104 L88 104" stroke="#525252" stroke-width="1" />
+          <!-- Thruster Nozzle -->
+          <polygon points="42,114 78,114 84,126 36,126" fill="#262626" stroke="#a3a3a3" stroke-width="1.5" />
+        </svg>
+
+        <!-- Vaskrona Logo Inside the Rocket Core -->
+        <img
+          src="/logo_vaskrona.png"
+          alt="Vaskrona Rocket Core"
+          class="absolute top-12 w-12 h-12 object-contain logo-glow"
+        />
+
+        <!-- Roaring Plasma Thruster Flame (at tail of rocket) -->
+        <div id="vaskrona-rocket-flame" class="rocket-flame -mt-3 flex flex-col items-center opacity-0 transition-opacity duration-200">
+          <div class="w-7 h-20 rounded-full bg-gradient-to-b from-white via-[#d4d4d4] to-transparent blur-[2px] shadow-[0_0_30px_#ffffff]"></div>
+          <div class=" -mt-16 w-3.5 h-14 rounded-full bg-white"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Impact Explosion Shockwave & Debris Container -->
+    <div id="cutscene-explosion" class="pointer-events-none fixed top-0 left-0 z-50 hidden -ml-32 -mt-32 w-64 h-64 items-center justify-center">
+      <div id="explosion-ring-1" class="absolute inset-0 rounded-full border-4 border-white opacity-90 scale-0 transition-all duration-700 ease-out"></div>
+      <div id="explosion-ring-2" class="absolute inset-6 rounded-full border-2 border-[#a3a3a3] opacity-80 scale-0 transition-all duration-700 delay-75 ease-out"></div>
+      <div class="w-28 h-28 rounded-full bg-white blur-xl opacity-90 animate-ping"></div>
+    </div>
+
+    <!-- Full-Screen Impact Flash -->
+    <div id="cutscene-flash" class="pointer-events-none fixed inset-0 z-50 bg-white opacity-0 transition-opacity duration-300"></div>
   </div>
 </section>
 
@@ -336,26 +411,212 @@ const hilmiChars = ['H', 'i', 'l', 'm', 'i'];
     });
   });
 
-  // 3D Two-Sided Coin Flip (Front: muka_saya.png -> Back: logo_vaskrona.png)
+  // 3D Two-Sided Coin Flip (Front: muka_saya.png -> Back: logo_vaskrona.png -> 2nd Click: Rocket Cutscene!)
   const profileCoin = document.getElementById('profile-coin');
   const coinRotor = document.getElementById('profile-coin-rotor');
+  const vaskronaBackImg = document.getElementById('vaskrona-back-img');
+  const cutsceneOverlay = document.getElementById('rocket-cutscene-overlay');
+  const barTop = document.getElementById('cutscene-bar-top');
+  const barBottom = document.getElementById('cutscene-bar-bottom');
+  const speedlines = document.getElementById('cutscene-speedlines');
+  const rocketActor = document.getElementById('vaskrona-rocket-actor');
+  const rocketFlame = document.getElementById('vaskrona-rocket-flame');
+  const explosionEl = document.getElementById('cutscene-explosion');
+  const expRing1 = document.getElementById('explosion-ring-1');
+  const expRing2 = document.getElementById('explosion-ring-2');
+  const flashEl = document.getElementById('cutscene-flash');
+  const altitudeEl = document.getElementById('cutscene-altitude');
+  const telemetryEl = document.getElementById('cutscene-telemetry');
+
   let coinDeg = 0;
+  let coinState: 'photo' | 'vaskrona' | 'launched' = 'photo';
 
-  function flipProfileCoin() {
+  function handleCoinClick() {
     if (!profileCoin || !coinRotor) return;
-    coinDeg += 540; // 1.5 spins for a realistic 3D coin toss flip to the opposite face
-    coinRotor.style.transform = `rotateY(${coinDeg}deg)`;
 
-    profileCoin.classList.remove('is-flipping');
-    void profileCoin.offsetWidth; // trigger reflow for bounce animation
-    profileCoin.classList.add('is-flipping');
+    // 1st Click: Flip from Foto Profil (muka_saya.png) to Logo Vaskrona
+    if (coinState === 'photo') {
+      coinState = 'vaskrona';
+      coinDeg += 540;
+      coinRotor.style.transform = `rotateY(${coinDeg}deg)`;
+
+      profileCoin.classList.remove('is-flipping');
+      void profileCoin.offsetWidth;
+      profileCoin.classList.add('is-flipping');
+      return;
+    }
+
+    // 2nd Click (while on Logo Vaskrona): Trigger Rocket Cutscene!
+    if (coinState === 'vaskrona') {
+      coinState = 'launched';
+      launchRocketCutscene();
+    }
   }
 
-  profileCoin?.addEventListener('click', flipProfileCoin);
+  function launchRocketCutscene() {
+    if (!profileCoin || !cutsceneOverlay || !rocketActor) return;
+
+    // 1. Lock all user interactions & pause Lenis smooth scroll
+    document.body.classList.add('cutscene-locked');
+    window.dispatchEvent(new CustomEvent('vaskrona:cutscene-lock', { detail: { locked: true } }));
+
+    // Reveal all sections below immediately so they are visible as camera flies past them
+    document.querySelectorAll('.reveal').forEach((el) => el.classList.add('active'));
+
+    // Get initial screen coordinates of the Vaskrona coin
+    const coinRect = profileCoin.getBoundingClientRect();
+    const startX = coinRect.left + coinRect.width / 2;
+    const startY = coinRect.top + coinRect.height / 2;
+
+    // Hide the Vaskrona logo inside the coin as it detaches into the rocket
+    if (vaskronaBackImg) {
+      vaskronaBackImg.style.opacity = '0';
+      vaskronaBackImg.style.transform = 'scale(0.5)';
+    }
+
+    // Show Cutscene Overlay & Letterbox Bars
+    cutsceneOverlay.classList.remove('hidden');
+    rocketActor.style.display = 'flex';
+    rocketActor.style.transition = 'none';
+    rocketActor.style.transform = `translate3d(${startX}px, ${startY}px, 0) rotate(0deg) scale(0.75)`;
+
+    requestAnimationFrame(() => {
+      barTop?.classList.remove('-translate-y-full');
+      barBottom?.classList.remove('translate-y-full');
+    });
+
+    // Phase 1 (0ms - 950ms): Rocket Morph, Center Lock, & Aim Downward (180deg)
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight * 0.42;
+
+    setTimeout(() => {
+      if (rocketFlame) rocketFlame.style.opacity = '1';
+      rocketActor.style.transition = 'transform 0.9s cubic-bezier(0.22, 1, 0.36, 1)';
+      rocketActor.style.transform = `translate3d(${centerX}px, ${centerY}px, 0) rotate(180deg) scale(1.05)`;
+    }, 60);
+
+    // Phase 2 (950ms - 3350ms): High-Speed Locked-POV Descent to the Night City Footer
+    setTimeout(() => {
+      if (speedlines) speedlines.style.opacity = '1';
+      rocketActor.style.transition = 'none';
+
+      const startScrollY = window.scrollY;
+      const maxScrollY = Math.max(
+        0,
+        document.documentElement.scrollHeight - window.innerHeight
+      );
+      const flightDuration = 2300;
+      const flightStart = performance.now();
+
+      function animateFlight(now: number) {
+        const elapsed = now - flightStart;
+        const progress = Math.min(1, elapsed / flightDuration);
+
+        // EaseInOutQuad for thrilling missile acceleration
+        const eased =
+          progress < 0.5
+            ? 2 * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+        // Lock Camera POV to scroll down with the rocket
+        const currentScroll = startScrollY + (maxScrollY - startScrollY) * eased;
+        window.scrollTo(0, currentScroll);
+
+        if (altitudeEl) {
+          const alt = Math.max(0, Math.round((1 - progress) * 100));
+          altitudeEl.textContent = `ALTITUDE: ${alt}%`;
+        }
+
+        // High-speed engine vibration
+        const jitterX = (Math.random() - 0.5) * 6;
+        const jitterY = (Math.random() - 0.5) * 6;
+
+        // In the final 25% of the dive, aim directly into #footer-impact-target (center of footer)
+        let rocketX = window.innerWidth / 2 + jitterX;
+        let rocketY = window.innerHeight * 0.42 + jitterY;
+
+        const impactTarget = document.getElementById('footer-impact-target');
+        if (impactTarget && progress > 0.72) {
+          const targetRect = impactTarget.getBoundingClientRect();
+          const targetX = targetRect.left + targetRect.width / 2;
+          const targetY = targetRect.top + targetRect.height * 0.65;
+          const diveProgress = (progress - 0.72) / 0.28;
+          rocketX = rocketX + (targetX - rocketX) * diveProgress;
+          rocketY = rocketY + (targetY - rocketY) * diveProgress;
+        }
+
+        rocketActor!.style.transform = `translate3d(${rocketX}px, ${rocketY}px, 0) rotate(180deg) scale(${1.05 + progress * 0.15})`;
+
+        if (progress < 1) {
+          requestAnimationFrame(animateFlight);
+        } else {
+          triggerFooterImpact();
+        }
+      }
+
+      requestAnimationFrame(animateFlight);
+    }, 980);
+  }
+
+  function triggerFooterImpact() {
+    if (!rocketActor || !cutsceneOverlay) return;
+
+    const impactTarget = document.getElementById('footer-impact-target');
+    const targetRect = impactTarget?.getBoundingClientRect();
+    const hitX = targetRect ? targetRect.left + targetRect.width / 2 : window.innerWidth / 2;
+    const hitY = targetRect ? targetRect.top + targetRect.height * 0.65 : window.innerHeight * 0.8;
+
+    // Hide rocket & speedlines upon impact
+    rocketActor.style.display = 'none';
+    if (speedlines) speedlines.style.opacity = '0';
+    if (telemetryEl) telemetryEl.textContent = 'IMPACT CONFIRMED // NIGHT CITY BREACHED';
+
+    // Show Explosion & Shockwave Rings at Footer Center
+    if (explosionEl) {
+      explosionEl.style.left = `${hitX}px`;
+      explosionEl.style.top = `${hitY}px`;
+      explosionEl.classList.remove('hidden');
+      explosionEl.classList.add('flex');
+      requestAnimationFrame(() => {
+        expRing1?.classList.remove('scale-0');
+        expRing1?.classList.add('scale-[2.6]', 'opacity-0');
+        expRing2?.classList.remove('scale-0');
+        expRing2?.classList.add('scale-[2.1]', 'opacity-0');
+      });
+    }
+
+    // Full-screen impact flash + camera shake
+    if (flashEl) flashEl.style.opacity = '0.85';
+    setTimeout(() => {
+      if (flashEl) flashEl.style.opacity = '0';
+    }, 180);
+
+    document.body.classList.add('impact-shaking');
+    setTimeout(() => {
+      document.body.classList.remove('impact-shaking');
+    }, 800);
+
+    // Notify Footer to shatter its center, disable Night City, and reveal the Game Entry Marker!
+    window.dispatchEvent(new CustomEvent('vaskrona:footer-crash'));
+
+    // End Cutscene & Unlock User Controls so they can click the secret entry marker
+    setTimeout(() => {
+      barTop?.classList.add('-translate-y-full');
+      barBottom?.classList.add('translate-y-full');
+    }, 650);
+
+    setTimeout(() => {
+      cutsceneOverlay.classList.add('hidden');
+      document.body.classList.remove('cutscene-locked');
+      window.dispatchEvent(new CustomEvent('vaskrona:cutscene-lock', { detail: { locked: false } }));
+    }, 1150);
+  }
+
+  profileCoin?.addEventListener('click', handleCoinClick);
   profileCoin?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      flipProfileCoin();
+      handleCoinClick();
     }
   });
 </script>
