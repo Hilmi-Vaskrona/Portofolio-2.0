@@ -1,0 +1,75 @@
+---
+/**
+ * AvatarFallback.astro
+ * Handles loading indicator, WebGL error fallback, and instructions for placing
+ * `public/models/vaskrona.gltf` (or `vaskrona.glb`) as required by PRD FR-02 & Section 12.
+ */
+---
+
+<div class="relative z-30 flex flex-col gap-1.5 pointer-events-auto">
+  <!-- Top Status Row: Model State + Quick Upload/Reload for vaskrona.gltf -->
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <div id="avatar-load-badge" class="vaskrona-status-pill" role="status" aria-live="polite">
+      <span id="avatar-status-dot" class="w-1.5 h-1.5 rounded-full bg-[#e5e5e5] animate-ping"></span>
+      <span id="avatar-status-text">MEMERIKSA MODEL VASKRONA.GLTF...</span>
+    </div>
+
+    <div class="flex items-center gap-1.5">
+      <!-- Local File Preview Button so user can test vaskrona.gltf / vaskrona.glb immediately -->
+      <label
+        for="vaskrona-file-input"
+        class="vaskrona-action-btn"
+        title="Uji file vaskrona.gltf atau vaskrona.glb langsung dari perangkat"
+      >
+        <span>LOAD .GLTF/.GLB</span>
+      </label>
+      <input
+        id="vaskrona-file-input"
+        type="file"
+        accept=".gltf,.glb"
+        class="hidden"
+      />
+
+      <!-- Toggle Asset Guide Popover -->
+      <button
+        id="avatar-guide-toggle"
+        type="button"
+        class="vaskrona-action-btn"
+        aria-expanded="false"
+        aria-controls="avatar-guide-panel"
+        title="Panduan penempatan file vaskrona.gltf"
+      >
+        <span>? INFO ASSET</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Collapsible Asset Placement Guide (Shown on demand or if user clicks '? INFO ASSET') -->
+  <div
+    id="avatar-guide-panel"
+    class="hidden rounded-xl border border-[#333333] bg-[#0a0a0a]/95 p-3 font-mono text-[10px] text-[#a3a3a3] shadow-2xl backdrop-blur-md"
+  >
+    <p class="text-[#e5e5e5] font-bold mb-1">
+      PENEMPATAN MODEL AVATAR ROBLOX (VASKRONA):
+    </p>
+    <p class="leading-relaxed mb-1.5">
+      Taruh file avatar 3D Anda di <code class="text-white bg-[#1a1a1a] px-1 py-0.5 rounded">public/models/vaskrona.gltf</code> (beserta file <code class="text-white">.bin</code> &amp; tekstur jika terpisah) atau <code class="text-white bg-[#1a1a1a] px-1 py-0.5 rounded">public/models/vaskrona.glb</code>.
+    </p>
+    <p class="text-[#737373] leading-relaxed">
+      Saat file belum tersedia, sistem menampilkan <span class="text-[#d4d4d4]">Roblox R15 Stand-In Rig</span> interaktif agar layar tidak kosong.
+    </p>
+  </div>
+
+  <!-- WebGL Unavailable Fallback (Only visible if browser lacks WebGL) -->
+  <div
+    id="avatar-webgl-error"
+    class="hidden rounded-xl border border-[#404040] bg-[#0d0d0d]/95 p-4 text-center font-mono text-xs text-[#d4d4d4]"
+    role="alert"
+  >
+    <p class="font-bold text-white mb-1">WEBGL TIDAK TERSEDIA</p>
+    <p class="text-[11px] text-[#a3a3a3]">
+      Perangkat atau browser Anda menonaktifkan akselerasi WebGL. Aktifkan hardware acceleration untuk melihat Avatar 3D Vaskrona secara interaktif.
+    </p>
+  </div>
+</div>
+

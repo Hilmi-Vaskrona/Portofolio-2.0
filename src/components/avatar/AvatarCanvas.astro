@@ -1,0 +1,311 @@
+---
+import AvatarFallback from './AvatarFallback.astro';
+import '../../styles/avatar.css';
+---
+
+<section
+  class="vaskrona-station-wrapper"
+  aria-label="Area Interaktif 3D Avatar Roblox Vaskrona sedang mengatur portofolio di multi-monitor"
+>
+  <!-- Top Status & Fallback / File Loader Bar -->
+  <AvatarFallback />
+
+  <!-- Main 3D WebGL Stage -->
+  <div id="vaskrona-canvas-stage" class="vaskrona-canvas-stage">
+    <!-- Speech Bubble on Click (FR-07) -->
+    <div id="vaskrona-speech-bubble" class="vaskrona-speech-bubble" role="status" aria-live="polite">
+      Hey! Nice to meet you! Lagi ngatur portofolio nih...
+    </div>
+
+    <!-- Ambient Floor Glow -->
+    <div class="vaskrona-floor-glow"></div>
+  </div>
+
+  <!-- Bottom Usability & Accessibility Bar (FR-10) -->
+  <div class="vaskrona-controls-bar relative z-30">
+    <span class="text-[9px] sm:text-[10px] text-[#a3a3a3]">
+      DRAG: PUTAR &bull; SCROLL: ZOOM &bull; KLIK AVATAR: REAKSI
+    </span>
+
+    <div class="flex items-center gap-1.5">
+      <button
+        id="vaskrona-react-btn"
+        type="button"
+        class="vaskrona-action-btn"
+        aria-label="Sapa Avatar Vaskrona"
+      >
+        <span>SAPA VASKRONA</span>
+      </button>
+      <button
+        id="vaskrona-reset-cam-btn"
+        type="button"
+        class="vaskrona-action-btn"
+        aria-label="Reset posisi kamera"
+      >
+        <span>RESET VIEW</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  import * as THREE from 'three';
+  import { createAvatarControls } from './AvatarControls';
+  import { createAvatarStation, type AvatarLoadStatus } from './AvatarModel';
+
+  const stageEl = document.getElementById('vaskrona-canvas-stage');
+  const bubbleEl = document.getElementById('vaskrona-speech-bubble');
+  const statusTextEl = document.getElementById('avatar-status-text');
+  const statusDotEl = document.getElementById('avatar-status-dot');
+  const webglErrorEl = document.getElementById('avatar-webgl-error');
+  const guideToggleBtn = document.getElementById('avatar-guide-toggle');
+  const guidePanelEl = document.getElementById('avatar-guide-panel');
+  const fileInputEl = document.getElementById('vaskrona-file-input') as HTMLInputElement | null;
+  const reactBtn = document.getElementById('vaskrona-react-btn');
+  const resetCamBtn = document.getElementById('vaskrona-reset-cam-btn');
+
+  // Toggle asset guide drawer
+  if (guideToggleBtn && guidePanelEl) {
+    guideToggleBtn.addEventListener('click', () => {
+      const isHidden = guidePanelEl.classList.toggle('hidden');
+      guideToggleBtn.setAttribute('aria-expanded', String(!isHidden));
+    });
+  }
+
+  // Speech messages when avatar is clicked (FR-07 & Section 8)
+  const reactionMessages = [
+    'Hey! Nice to meet you! Lagi ngoding & ngatur portofolio nih!',
+    "Hi, I'm Vaskrona! Semua modul Portofolio 2.0 siap dijalankan.",
+    'Deploying update terbaru dari ruang bawah tanah Sector 00...',
+    'Cek layar utama di belakangku — live preview portofolio lagi jalan!',
+  ];
+  let messageIdx = 0;
+  let bubbleTimer: number | null = null;
+
+  function showSpeechBubble(customMessage?: string) {
+    if (!bubbleEl) return;
+    const text = customMessage ?? reactionMessages[messageIdx % reactionMessages.length];
+    if (!customMessage) messageIdx++;
+
+    bubbleEl.textContent = text;
+    bubbleEl.classList.add('is-visible');
+
+    if (bubbleTimer !== null) {
+      window.clearTimeout(bubbleTimer);
+    }
+    bubbleTimer = window.setTimeout(() => {
+      bubbleEl.classList.remove('is-visible');
+      bubbleTimer = null;
+    }, 3200);
+  }
+
+  function updateStatusUI(status: AvatarLoadStatus) {
+    if (!statusTextEl || !statusDotEl) return;
+
+    if (status.state === 'loading') {
+      statusTextEl.textContent = status.message.toUpperCase();
+      statusDotEl.className = 'w-1.5 h-1.5 rounded-full bg-[#e5e5e5] animate-ping';
+    } else if (status.state === 'loaded') {
+      const waveTag = status.hasWaveClip ? ' + WAVE CLIP' : '';
+      statusTextEl.textContent = `VASKRONA 3D AKTIF (${status.sourcePath}${waveTag})`;
+      statusDotEl.className = 'w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_#fff]';
+    } else if (status.state === 'standin') {
+      statusTextEl.textContent = 'ROBLOX WORKSTATION AKTIF // SIAP UNTUK VASKRONA.GLTF';
+      statusDotEl.className = 'w-1.5 h-1.5 rounded-full bg-[#a3a3a3]';
+    } else {
+      statusTextEl.textContent = status.reason.toUpperCase();
+      statusDotEl.className = 'w-1.5 h-1.5 rounded-full bg-[#737373]';
+    }
+  }
+
+  if (stageEl) {
+    let renderer: THREE.WebGLRenderer | null = null;
+
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance',
+      });
+    } catch {
+      renderer = null;
+    }
+
+    if (!renderer) {
+      // Section 12: Handle WebGL unavailable gracefully
+      webglErrorEl?.classList.remove('hidden');
+      stageEl.classList.add('hidden');
+    } else {
+      const activeRenderer = renderer;
+      activeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      activeRenderer.outputColorSpace = THREE.SRGBColorSpace;
+      activeRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+      activeRenderer.toneMappingExposure = 1.15;
+
+      const initialWidth = Math.max(stageEl.clientWidth, 300);
+      const initialHeight = Math.max(stageEl.clientHeight, 320);
+      activeRenderer.setSize(initialWidth, initialHeight);
+      stageEl.appendChild(activeRenderer.domElement);
+
+      const scene = new THREE.Scene();
+
+      // Camera framed for the Avatar facing BACK-LEFT toward the Big Screen + 4 Small Screens
+      const camera = new THREE.PerspectiveCamera(42, initialWidth / initialHeight, 0.1, 40);
+      camera.position.set(0.32, 1.62, 3.85);
+
+      // Studio & Screen Glow Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+      scene.add(ambientLight);
+
+      const mainScreenGlowLight = new THREE.PointLight(0xffffff, 2.2, 8);
+      mainScreenGlowLight.position.set(0, 1.65, 0.35);
+      scene.add(mainScreenGlowLight);
+
+      const frontKeyLight = new THREE.DirectionalLight(0xe5e5e5, 1.6);
+      frontKeyLight.position.set(1.8, 3.2, 2.6);
+      scene.add(frontKeyLight);
+
+      const leftMonitorRimLight = new THREE.PointLight(0xd4d4d4, 1.2, 6);
+      leftMonitorRimLight.position.set(-1.6, 1.5, 0.4);
+      scene.add(leftMonitorRimLight);
+
+      const rightMonitorRimLight = new THREE.PointLight(0xd4d4d4, 1.2, 6);
+      rightMonitorRimLight.position.set(1.6, 1.5, 0.4);
+      scene.add(rightMonitorRimLight);
+
+      // Orbit & Zoom Controls (FR-05, FR-06)
+      const controlsHandle = createAvatarControls(camera, activeRenderer.domElement, {
+        target: [0, 1.18, -0.05],
+        minDistance: 2.3,
+        maxDistance: 5.8,
+      });
+
+      // Avatar + Multi-Monitor Workstation (FR-01 to FR-08)
+      const stationHandle = createAvatarStation(scene, updateStatusUI);
+
+      // Respect prefers-reduced-motion (FR-09)
+      const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let reducedMotion = motionMedia.matches;
+      const onMotionPrefChange = (e: MediaQueryListEvent) => {
+        reducedMotion = e.matches;
+      };
+      motionMedia.addEventListener('change', onMotionPrefChange);
+
+      // Pointer Tracking & Click Raycasting (FR-04, FR-07)
+      const raycaster = new THREE.Raycaster();
+      const pointerNdc = new THREE.Vector2();
+      let downX = 0;
+      let downY = 0;
+
+      const onPointerMove = (e: PointerEvent) => {
+        const rect = activeRenderer.domElement.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        pointerNdc.set(x, y);
+
+        if (!controlsHandle.isDragging()) {
+          stationHandle.setPointerTarget(x, y, true);
+        }
+      };
+
+      const onPointerLeave = () => {
+        stationHandle.setPointerTarget(0, 0, false);
+      };
+
+      const onPointerDown = (e: PointerEvent) => {
+        downX = e.clientX;
+        downY = e.clientY;
+      };
+
+      const onPointerUp = (e: PointerEvent) => {
+        const moveDist = Math.hypot(e.clientX - downX, e.clientY - downY);
+        if (moveDist > 6) return; // Ignore orbit drag release
+
+        const rect = activeRenderer.domElement.getBoundingClientRect();
+        pointerNdc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        pointerNdc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(pointerNdc, camera);
+        const hits = raycaster.intersectObjects(
+          [stationHandle.avatarHitbox, stationHandle.rootGroup],
+          true
+        );
+
+        if (hits.length > 0) {
+          stationHandle.triggerClickReaction();
+          showSpeechBubble();
+        }
+      };
+
+      activeRenderer.domElement.addEventListener('pointermove', onPointerMove);
+      activeRenderer.domElement.addEventListener('pointerleave', onPointerLeave);
+      activeRenderer.domElement.addEventListener('pointerdown', onPointerDown);
+      activeRenderer.domElement.addEventListener('pointerup', onPointerUp);
+
+      // Accessible Buttons (FR-10)
+      reactBtn?.addEventListener('click', () => {
+        stationHandle.triggerClickReaction();
+        showSpeechBubble();
+      });
+
+      resetCamBtn?.addEventListener('click', () => {
+        controlsHandle.resetView();
+      });
+
+      // Local File Input for instant testing of vaskrona.gltf / vaskrona.glb
+      let activeBlobUrl: string | null = null;
+      fileInputEl?.addEventListener('change', () => {
+        const file = fileInputEl.files?.[0];
+        if (!file) return;
+        if (activeBlobUrl) {
+          URL.revokeObjectURL(activeBlobUrl);
+        }
+        activeBlobUrl = URL.createObjectURL(file);
+        void stationHandle.loadCustomModelUrl(activeBlobUrl, file.name).then(() => {
+          showSpeechBubble(`Model ${file.name} berhasil dimuat ke workstation!`);
+        });
+      });
+
+      // Responsive Resize Observer (FR-09)
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const width = Math.max(entry.contentRect.width, 260);
+          const height = Math.max(entry.contentRect.height, 260);
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+          activeRenderer.setSize(width, height);
+        }
+      });
+      resizeObserver.observe(stageEl);
+
+      // Render Loop
+      const clock = new THREE.Clock();
+      let animFrameId = 0;
+
+      function animate() {
+        animFrameId = requestAnimationFrame(animate);
+        const delta = clock.getDelta();
+        const elapsed = clock.getElapsedTime();
+
+        controlsHandle.controls.update();
+        stationHandle.update(delta, elapsed, reducedMotion);
+        activeRenderer.render(scene, camera);
+      }
+
+      animate();
+
+      // Cleanup on page hide / navigation
+      window.addEventListener('pagehide', () => {
+        cancelAnimationFrame(animFrameId);
+        if (bubbleTimer !== null) window.clearTimeout(bubbleTimer);
+        if (activeBlobUrl) URL.revokeObjectURL(activeBlobUrl);
+        resizeObserver.disconnect();
+        motionMedia.removeEventListener('change', onMotionPrefChange);
+        controlsHandle.dispose();
+        stationHandle.dispose();
+        activeRenderer.dispose();
+      });
+    }
+  }
+</script>
+
