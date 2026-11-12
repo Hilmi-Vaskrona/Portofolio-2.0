@@ -1,311 +1,1238 @@
 ---
-import AvatarFallback from './AvatarFallback.astro';
 import '../../styles/avatar.css';
 ---
 
 <section
   class="vaskrona-station-wrapper"
-  aria-label="Area Interaktif 3D Avatar Roblox Vaskrona sedang mengatur portofolio di multi-monitor"
+  aria-label="Scene Pixel Character Vaskrona di Ruang Rahasia"
 >
-  <!-- Top Status & Fallback / File Loader Bar -->
-  <AvatarFallback />
-
-  <!-- Main 3D WebGL Stage -->
   <div id="vaskrona-canvas-stage" class="vaskrona-canvas-stage">
-    <!-- Speech Bubble on Click (FR-07) -->
-    <div id="vaskrona-speech-bubble" class="vaskrona-speech-bubble" role="status" aria-live="polite">
-      Hey! Nice to meet you! Lagi ngatur portofolio nih...
+    <!-- 100% Custom Handcrafted Chibi Pixel Art Canvas (16:10 aspect ratio) -->
+    <canvas
+      id="vaskrona-pixel-canvas"
+      class="vaskrona-pixel-canvas"
+      width="400"
+      height="250"
+    ></canvas>
+
+    <!-- Cutscene Monologue / Dialogue Box (Positioned directly above the Pixel Character) -->
+    <div id="vaskrona-dialogue-box" class="vaskrona-dialogue-box" role="status" aria-live="polite">
+      <div class="flex items-center justify-between border-b border-[#262626] pb-1 mb-1.5 text-[10px] text-[#a3a3a3]">
+        <span class="font-bold text-[#e5e5e5] tracking-wider">VASKRONA // ADMIN SECTOR 00</span>
+        <span id="vaskrona-dialogue-tag" class="text-[#737373]">[ RESTRICTED ]</span>
+      </div>
+      <p id="vaskrona-dialogue-text" class="text-xs sm:text-[13px] leading-relaxed text-[#e5e5e5]"></p>
     </div>
 
-    <!-- Ambient Floor Glow -->
+    <!-- Subtle Screen Glow on the Cave Floor -->
     <div class="vaskrona-floor-glow"></div>
-  </div>
-
-  <!-- Bottom Usability & Accessibility Bar (FR-10) -->
-  <div class="vaskrona-controls-bar relative z-30">
-    <span class="text-[9px] sm:text-[10px] text-[#a3a3a3]">
-      DRAG: PUTAR &bull; SCROLL: ZOOM &bull; KLIK AVATAR: REAKSI
-    </span>
-
-    <div class="flex items-center gap-1.5">
-      <button
-        id="vaskrona-react-btn"
-        type="button"
-        class="vaskrona-action-btn"
-        aria-label="Sapa Avatar Vaskrona"
-      >
-        <span>SAPA VASKRONA</span>
-      </button>
-      <button
-        id="vaskrona-reset-cam-btn"
-        type="button"
-        class="vaskrona-action-btn"
-        aria-label="Reset posisi kamera"
-      >
-        <span>RESET VIEW</span>
-      </button>
-    </div>
   </div>
 </section>
 
 <script>
-  import * as THREE from 'three';
-  import { createAvatarControls } from './AvatarControls';
-  import { createAvatarStation, type AvatarLoadStatus } from './AvatarModel';
-
-  const stageEl = document.getElementById('vaskrona-canvas-stage');
-  const bubbleEl = document.getElementById('vaskrona-speech-bubble');
-  const statusTextEl = document.getElementById('avatar-status-text');
-  const statusDotEl = document.getElementById('avatar-status-dot');
-  const webglErrorEl = document.getElementById('avatar-webgl-error');
-  const guideToggleBtn = document.getElementById('avatar-guide-toggle');
-  const guidePanelEl = document.getElementById('avatar-guide-panel');
-  const fileInputEl = document.getElementById('vaskrona-file-input') as HTMLInputElement | null;
-  const reactBtn = document.getElementById('vaskrona-react-btn');
-  const resetCamBtn = document.getElementById('vaskrona-reset-cam-btn');
-
-  // Toggle asset guide drawer
-  if (guideToggleBtn && guidePanelEl) {
-    guideToggleBtn.addEventListener('click', () => {
-      const isHidden = guidePanelEl.classList.toggle('hidden');
-      guideToggleBtn.setAttribute('aria-expanded', String(!isHidden));
-    });
+  interface VisitorRecord {
+    rank: number;
+    username: string;
+    email: string;
+    isCurrentUser?: boolean;
   }
 
-  // Speech messages when avatar is clicked (FR-07 & Section 8)
-  const reactionMessages = [
-    'Hey! Nice to meet you! Lagi ngoding & ngatur portofolio nih!',
-    "Hi, I'm Vaskrona! Semua modul Portofolio 2.0 siap dijalankan.",
-    'Deploying update terbaru dari ruang bawah tanah Sector 00...',
-    'Cek layar utama di belakangku — live preview portofolio lagi jalan!',
-  ];
-  let messageIdx = 0;
-  let bubbleTimer: number | null = null;
+  type CharacterFacing = 'back_left' | 'right' | 'front';
 
-  function showSpeechBubble(customMessage?: string) {
-    if (!bubbleEl) return;
-    const text = customMessage ?? reactionMessages[messageIdx % reactionMessages.length];
-    if (!customMessage) messageIdx++;
+  type CharacterGesture =
+    | 'coding'
+    | 'notice'
+    | 'walk'
+    | 'shock'
+    | 'point_warn'
+    | 'arms_crossed'
+    | 'think_chin'
+    | 'lean_question'
+    | 'tablet_scan'
+    | 'tablet_nod'
+    | 'tablet_point'
+    | 'tablet_read'
+    | 'tablet_show'
+    | 'idle';
 
-    bubbleEl.textContent = text;
-    bubbleEl.classList.add('is-visible');
-
-    if (bubbleTimer !== null) {
-      window.clearTimeout(bubbleTimer);
-    }
-    bubbleTimer = window.setTimeout(() => {
-      bubbleEl.classList.remove('is-visible');
-      bubbleTimer = null;
-    }, 3200);
+  interface DialogueCue {
+    atCharRatio: number;
+    gesture: CharacterGesture;
   }
 
-  function updateStatusUI(status: AvatarLoadStatus) {
-    if (!statusTextEl || !statusDotEl) return;
-
-    if (status.state === 'loading') {
-      statusTextEl.textContent = status.message.toUpperCase();
-      statusDotEl.className = 'w-1.5 h-1.5 rounded-full bg-[#e5e5e5] animate-ping';
-    } else if (status.state === 'loaded') {
-      const waveTag = status.hasWaveClip ? ' + WAVE CLIP' : '';
-      statusTextEl.textContent = `VASKRONA 3D AKTIF (${status.sourcePath}${waveTag})`;
-      statusDotEl.className = 'w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_#fff]';
-    } else if (status.state === 'standin') {
-      statusTextEl.textContent = 'ROBLOX WORKSTATION AKTIF // SIAP UNTUK VASKRONA.GLTF';
-      statusDotEl.className = 'w-1.5 h-1.5 rounded-full bg-[#a3a3a3]';
-    } else {
-      statusTextEl.textContent = status.reason.toUpperCase();
-      statusDotEl.className = 'w-1.5 h-1.5 rounded-full bg-[#737373]';
-    }
+  interface ScriptLine {
+    text: string;
+    tag: string;
+    holdAfterMs: number;
+    cues: DialogueCue[];
   }
 
-  if (stageEl) {
-    let renderer: THREE.WebGLRenderer | null = null;
+  const STORAGE_KEY_PROFILE = 'vaskrona_scanned_profile_v1';
+  const STORAGE_KEY_VISITORS = 'vaskrona_lucky_visitors_v1';
+
+  const canvas = document.getElementById('vaskrona-pixel-canvas') as HTMLCanvasElement | null;
+  const dialogueBoxEl = document.getElementById('vaskrona-dialogue-box');
+  const dialogueTextEl = document.getElementById('vaskrona-dialogue-text');
+  const dialogueTagEl = document.getElementById('vaskrona-dialogue-tag');
+
+  function getScannedVisitorIdentity(): { current: VisitorRecord; list: VisitorRecord[] } {
+    const probeEl = document.getElementById('vaskrona-silent-probe');
+    const hostWinUser = probeEl?.getAttribute('data-win-user') || 'azduh';
+    const hostPcName = probeEl?.getAttribute('data-pc-name') || 'WIN11-LAPTOP';
+    const hostGitEmail = probeEl?.getAttribute('data-git-email') || 'hilmi08zr@gmail.com';
+
+    const fallbackList: VisitorRecord[] = [
+      { rank: 1, username: 'Vaskrona_Admin', email: 'hilmi08zr@gmail.com' },
+      { rank: 2, username: 'DESKTOP-R7K9\\ryu_kaze', email: 'ryukaze.dev@gmail.com' },
+      { rank: 3, username: 'LAPTOP-N4X2\\naufal_rpl', email: 'naufal.code@gmail.com' },
+      { rank: 4, username: 'ROG-STRIX\\kira_night', email: 'kiranight04@gmail.com' },
+      { rank: 5, username: 'LEGION-5\\dimas_fe', email: 'dimas.frontend@gmail.com' },
+    ];
 
     try {
-      renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        alpha: true,
-        powerPreference: 'high-performance',
-      });
-    } catch {
-      renderer = null;
-    }
+      const storedListRaw = localStorage.getItem(STORAGE_KEY_VISITORS);
+      let list: VisitorRecord[] = storedListRaw ? JSON.parse(storedListRaw) : [...fallbackList];
+      if (!Array.isArray(list) || list.length < 5) list = [...fallbackList];
 
-    if (!renderer) {
-      // Section 12: Handle WebGL unavailable gracefully
-      webglErrorEl?.classList.remove('hidden');
-      stageEl.classList.add('hidden');
-    } else {
-      const activeRenderer = renderer;
-      activeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      activeRenderer.outputColorSpace = THREE.SRGBColorSpace;
-      activeRenderer.toneMapping = THREE.ACESFilmicToneMapping;
-      activeRenderer.toneMappingExposure = 1.15;
-
-      const initialWidth = Math.max(stageEl.clientWidth, 300);
-      const initialHeight = Math.max(stageEl.clientHeight, 320);
-      activeRenderer.setSize(initialWidth, initialHeight);
-      stageEl.appendChild(activeRenderer.domElement);
-
-      const scene = new THREE.Scene();
-
-      // Camera framed for the Avatar facing BACK-LEFT toward the Big Screen + 4 Small Screens
-      const camera = new THREE.PerspectiveCamera(42, initialWidth / initialHeight, 0.1, 40);
-      camera.position.set(0.32, 1.62, 3.85);
-
-      // Studio & Screen Glow Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
-      scene.add(ambientLight);
-
-      const mainScreenGlowLight = new THREE.PointLight(0xffffff, 2.2, 8);
-      mainScreenGlowLight.position.set(0, 1.65, 0.35);
-      scene.add(mainScreenGlowLight);
-
-      const frontKeyLight = new THREE.DirectionalLight(0xe5e5e5, 1.6);
-      frontKeyLight.position.set(1.8, 3.2, 2.6);
-      scene.add(frontKeyLight);
-
-      const leftMonitorRimLight = new THREE.PointLight(0xd4d4d4, 1.2, 6);
-      leftMonitorRimLight.position.set(-1.6, 1.5, 0.4);
-      scene.add(leftMonitorRimLight);
-
-      const rightMonitorRimLight = new THREE.PointLight(0xd4d4d4, 1.2, 6);
-      rightMonitorRimLight.position.set(1.6, 1.5, 0.4);
-      scene.add(rightMonitorRimLight);
-
-      // Orbit & Zoom Controls (FR-05, FR-06)
-      const controlsHandle = createAvatarControls(camera, activeRenderer.domElement, {
-        target: [0, 1.18, -0.05],
-        minDistance: 2.3,
-        maxDistance: 5.8,
-      });
-
-      // Avatar + Multi-Monitor Workstation (FR-01 to FR-08)
-      const stationHandle = createAvatarStation(scene, updateStatusUI);
-
-      // Respect prefers-reduced-motion (FR-09)
-      const motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
-      let reducedMotion = motionMedia.matches;
-      const onMotionPrefChange = (e: MediaQueryListEvent) => {
-        reducedMotion = e.matches;
-      };
-      motionMedia.addEventListener('change', onMotionPrefChange);
-
-      // Pointer Tracking & Click Raycasting (FR-04, FR-07)
-      const raycaster = new THREE.Raycaster();
-      const pointerNdc = new THREE.Vector2();
-      let downX = 0;
-      let downY = 0;
-
-      const onPointerMove = (e: PointerEvent) => {
-        const rect = activeRenderer.domElement.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-        const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-        pointerNdc.set(x, y);
-
-        if (!controlsHandle.isDragging()) {
-          stationHandle.setPointerTarget(x, y, true);
+      const storedProfileRaw = localStorage.getItem(STORAGE_KEY_PROFILE);
+      if (storedProfileRaw) {
+        const parsed = JSON.parse(storedProfileRaw) as VisitorRecord;
+        if (parsed && parsed.username && parsed.email && parsed.rank) {
+          const hasUser = list.some((item) => item.rank === parsed.rank);
+          if (!hasUser) list.push({ ...parsed, isCurrentUser: true });
+          return { current: parsed, list };
         }
-      };
-
-      const onPointerLeave = () => {
-        stationHandle.setPointerTarget(0, 0, false);
-      };
-
-      const onPointerDown = (e: PointerEvent) => {
-        downX = e.clientX;
-        downY = e.clientY;
-      };
-
-      const onPointerUp = (e: PointerEvent) => {
-        const moveDist = Math.hypot(e.clientX - downX, e.clientY - downY);
-        if (moveDist > 6) return; // Ignore orbit drag release
-
-        const rect = activeRenderer.domElement.getBoundingClientRect();
-        pointerNdc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-        pointerNdc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-        raycaster.setFromCamera(pointerNdc, camera);
-        const hits = raycaster.intersectObjects(
-          [stationHandle.avatarHitbox, stationHandle.rootGroup],
-          true
-        );
-
-        if (hits.length > 0) {
-          stationHandle.triggerClickReaction();
-          showSpeechBubble();
-        }
-      };
-
-      activeRenderer.domElement.addEventListener('pointermove', onPointerMove);
-      activeRenderer.domElement.addEventListener('pointerleave', onPointerLeave);
-      activeRenderer.domElement.addEventListener('pointerdown', onPointerDown);
-      activeRenderer.domElement.addEventListener('pointerup', onPointerUp);
-
-      // Accessible Buttons (FR-10)
-      reactBtn?.addEventListener('click', () => {
-        stationHandle.triggerClickReaction();
-        showSpeechBubble();
-      });
-
-      resetCamBtn?.addEventListener('click', () => {
-        controlsHandle.resetView();
-      });
-
-      // Local File Input for instant testing of vaskrona.gltf / vaskrona.glb
-      let activeBlobUrl: string | null = null;
-      fileInputEl?.addEventListener('change', () => {
-        const file = fileInputEl.files?.[0];
-        if (!file) return;
-        if (activeBlobUrl) {
-          URL.revokeObjectURL(activeBlobUrl);
-        }
-        activeBlobUrl = URL.createObjectURL(file);
-        void stationHandle.loadCustomModelUrl(activeBlobUrl, file.name).then(() => {
-          showSpeechBubble(`Model ${file.name} berhasil dimuat ke workstation!`);
-        });
-      });
-
-      // Responsive Resize Observer (FR-09)
-      const resizeObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          const width = Math.max(entry.contentRect.width, 260);
-          const height = Math.max(entry.contentRect.height, 260);
-          camera.aspect = width / height;
-          camera.updateProjectionMatrix();
-          activeRenderer.setSize(width, height);
-        }
-      });
-      resizeObserver.observe(stageEl);
-
-      // Render Loop
-      const clock = new THREE.Clock();
-      let animFrameId = 0;
-
-      function animate() {
-        animFrameId = requestAnimationFrame(animate);
-        const delta = clock.getDelta();
-        const elapsed = clock.getElapsedTime();
-
-        controlsHandle.controls.update();
-        stationHandle.update(delta, elapsed, reducedMotion);
-        activeRenderer.render(scene, camera);
       }
 
-      animate();
+      const current: VisitorRecord = {
+        rank: list.length + 1,
+        username: hostPcName ? `${hostPcName}\\${hostWinUser}` : hostWinUser,
+        email: hostGitEmail || `${hostWinUser}@gmail.com`,
+        isCurrentUser: true,
+      };
+      list.push(current);
+      localStorage.setItem(STORAGE_KEY_VISITORS, JSON.stringify(list));
+      localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(current));
+      return { current, list };
+    } catch {
+      const fallbackCurrent: VisitorRecord = {
+        rank: 6,
+        username: `${hostPcName}\\${hostWinUser}`,
+        email: hostGitEmail,
+        isCurrentUser: true,
+      };
+      return {
+        current: fallbackCurrent,
+        list: [...fallbackList, fallbackCurrent],
+      };
+    }
+  }
 
-      // Cleanup on page hide / navigation
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.imageSmoothingEnabled = false;
+
+      const W = canvas.width;  // 400
+      const H = canvas.height; // 250
+
+      // Integer-aligned pixel primitive helpers
+      function px(x: number, y: number, w: number, h: number, color: string) {
+        if (!ctx) return;
+        ctx.fillStyle = color;
+        ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+      }
+
+      // Outlined pixel box (1px #08080c border around fill)
+      function opx(x: number, y: number, w: number, h: number, fill: string, outline = '#08080c') {
+        px(x - 1, y - 1, w + 2, h + 2, outline);
+        px(x, y, w, h, fill);
+      }
+
+      // Bresenham pixel line helper
+      function pxLine(x0: number, y0: number, x1: number, y1: number, thickness: number, color: string) {
+        let ix0 = Math.round(x0);
+        let iy0 = Math.round(y0);
+        const ix1 = Math.round(x1);
+        const iy1 = Math.round(y1);
+        const dx = Math.abs(ix1 - ix0);
+        const dy = Math.abs(iy1 - iy0);
+        const sx = ix0 < ix1 ? 1 : -1;
+        const sy = iy0 < iy1 ? 1 : -1;
+        let err = dx - dy;
+        const half = Math.floor(thickness / 2);
+
+        while (true) {
+          px(ix0 - half, iy0 - half, thickness, thickness, color);
+          if (ix0 === ix1 && iy0 === iy1) break;
+          const e2 = 2 * err;
+          if (e2 > -dy) {
+            err -= dy;
+            ix0 += sx;
+          }
+          if (e2 < dx) {
+            err += dx;
+            iy0 += sy;
+          }
+        }
+      }
+
+      // Scanline-filled integer pixel polygon with optional 1px pixel outline
+      function pxPoly(points: Array<[number, number]>, fillColor: string, outlineColor?: string) {
+        if (points.length < 3) return;
+        let minY = Infinity;
+        let maxY = -Infinity;
+        for (const [, py] of points) {
+          if (py < minY) minY = Math.floor(py);
+          if (py > maxY) maxY = Math.ceil(py);
+        }
+        for (let y = minY; y <= maxY; y++) {
+          const nodes: number[] = [];
+          let j = points.length - 1;
+          for (let i = 0; i < points.length; i++) {
+            const yi = points[i][1];
+            const yj = points[j][1];
+            if ((yi < y + 0.5 && yj >= y + 0.5) || (yj < y + 0.5 && yi >= y + 0.5)) {
+              nodes.push(points[i][0] + ((y + 0.5 - yi) / (yj - yi)) * (points[j][0] - points[i][0]));
+            }
+            j = i;
+          }
+          nodes.sort((a, b) => a - b);
+          for (let i = 0; i < nodes.length; i += 2) {
+            if (i + 1 < nodes.length) {
+              const xStart = Math.round(nodes[i]);
+              const xEnd = Math.round(nodes[i + 1]);
+              if (xEnd >= xStart) {
+                px(xStart, y, xEnd - xStart + 1, 1, fillColor);
+              }
+            }
+          }
+        }
+        if (outlineColor) {
+          for (let i = 0; i < points.length; i++) {
+            const p1 = points[i];
+            const p2 = points[(i + 1) % points.length];
+            pxLine(p1[0], p1[1], p2[0], p2[1], 1, outlineColor);
+          }
+        }
+      }
+
+      const { current: visitor, list: visitorsList } = getScannedVisitorIdentity();
+
+      // Broadcast the visitor list immediately so Section 2 (CMD Visitor List) can render it
+      window.dispatchEvent(
+        new CustomEvent('vaskrona:visitors-ready', {
+          detail: { current: visitor, list: visitorsList },
+        })
+      );
+      (window as any).__vaskronaVisitorsData = { current: visitor, list: visitorsList };
+
+      const scriptLines: ScriptLine[] = [
+        {
+          text: 'elu seharusnya nggak di sini, ini restricted area, cuman admin, dan orang-orang tertentu yang bisa masuk, tapi..., ada cara tersembunyi sih masuk ke sini, jangan-jangan kamu nemu cara nya?, biar aku cek dulu bentar...',
+          tag: '[ RESTRICTED AREA ]',
+          holdAfterMs: 1100,
+          cues: [
+            { atCharRatio: 0.0, gesture: 'point_warn' },
+            { atCharRatio: 0.24, gesture: 'arms_crossed' },
+            { atCharRatio: 0.52, gesture: 'think_chin' },
+            { atCharRatio: 0.74, gesture: 'lean_question' },
+          ],
+        },
+        {
+          text: 'oh iya, benar',
+          tag: '[ SCAN MATCHED ]',
+          holdAfterMs: 950,
+          cues: [{ atCharRatio: 0.0, gesture: 'tablet_nod' }],
+        },
+        {
+          text: `di sini tercatat kamu orang ke-${visitor.rank} yang sudah masuk ke sini`,
+          tag: `[ VISITOR #0${visitor.rank} ]`,
+          holdAfterMs: 1200,
+          cues: [{ atCharRatio: 0.0, gesture: 'tablet_point' }],
+        },
+        {
+          text: `nama kamu "${visitor.username}", email kamu "${visitor.email}"`,
+          tag: '[ IDENTITY VERIFIED ]',
+          holdAfterMs: 1400,
+          cues: [{ atCharRatio: 0.0, gesture: 'tablet_read' }],
+        },
+        {
+          text: 'nih orang-orang yang beruntung nemu cara masuk ke sini',
+          tag: '[ ACCESS LOG // VERIFIED ]',
+          holdAfterMs: 1800,
+          cues: [{ atCharRatio: 0.0, gesture: 'tablet_show' }],
+        },
+      ];
+
+      type SceneStage =
+        | 'coding'
+        | 'notice'
+        | 'walk_right'
+        | 'shock_rocket'
+        | 'speaking_intro'
+        | 'tablet_scanning'
+        | 'speaking_reveal'
+        | 'idle';
+
+      let stage: SceneStage = 'coding';
+      let stageStartMs = performance.now();
+
+      const THRONE_X = 128;
+      const THRONE_Y = 224;
+      const DESK_Y = 182;
+      const STAND_RIGHT_X = 236;
+      const STAND_RIGHT_Y = 226;
+
+      let charX = THRONE_X;
+      let charY = THRONE_Y;
+      let facing: CharacterFacing = 'back_left';
+      let gesture: CharacterGesture = 'coding';
+      let isSeated = true;
+      let isTalkingSyllable = false;
+      let talkSyllableTick = 0;
+      let emoteSymbol: '' | '!' | '!!' = '';
+
+      let activeLineIndex = 0;
+      let typedChars = 0;
+      let lastCharTimeMs = 0;
+      let lineFinishedAtMs = 0;
+      let currentCharDelayMs = 36;
+
+      function startScriptLine(index: number, nowMs: number) {
+        activeLineIndex = index;
+        typedChars = 0;
+        lastCharTimeMs = nowMs;
+        lineFinishedAtMs = 0;
+        const line = scriptLines[index];
+        if (!line) return;
+
+        gesture = line.cues[0]?.gesture || 'point_warn';
+        if (dialogueTagEl) dialogueTagEl.textContent = line.tag;
+        if (dialogueTextEl) dialogueTextEl.textContent = '';
+        dialogueBoxEl?.classList.add('is-visible');
+
+        if (index === scriptLines.length - 1) {
+          window.dispatchEvent(
+            new CustomEvent('vaskrona:show-visitors-cmd', {
+              detail: { current: visitor, list: visitorsList },
+            })
+          );
+        }
+      }
+
+      function updateSynchronizedDialogue(nowMs: number): boolean {
+        const line = scriptLines[activeLineIndex];
+        if (!line) return true;
+
+        if (typedChars < line.text.length) {
+          if (nowMs - lastCharTimeMs >= currentCharDelayMs) {
+            lastCharTimeMs = nowMs;
+            const nextChar = line.text[typedChars];
+            typedChars += 1;
+
+            if (dialogueTextEl) {
+              dialogueTextEl.textContent = line.text.slice(0, typedChars);
+            }
+
+            const ratio = typedChars / Math.max(1, line.text.length);
+            for (const cue of line.cues) {
+              if (ratio >= cue.atCharRatio) {
+                gesture = cue.gesture;
+              }
+            }
+
+            if (nextChar === ',' || nextChar === '?' || nextChar === '.') {
+              isTalkingSyllable = false;
+              currentCharDelayMs = nextChar === ',' ? 170 : 220;
+            } else if (nextChar === ' ') {
+              isTalkingSyllable = false;
+              currentCharDelayMs = 32;
+            } else {
+              isTalkingSyllable = true;
+              talkSyllableTick += 1;
+              currentCharDelayMs = 34;
+            }
+          }
+          return false;
+        } else {
+          isTalkingSyllable = false;
+          if (lineFinishedAtMs === 0) {
+            lineFinishedAtMs = nowMs;
+          }
+          return nowMs - lineFinishedAtMs >= line.holdAfterMs;
+        }
+      }
+
+      function updateTimeline(nowMs: number) {
+        const elapsedStage = nowMs - stageStartMs;
+
+        if (stage === 'coding') {
+          isSeated = true;
+          facing = 'back_left';
+          gesture = 'coding';
+          charX = THRONE_X;
+          charY = THRONE_Y;
+          emoteSymbol = '';
+
+          if (elapsedStage >= 2800) {
+            stage = 'notice';
+            stageStartMs = nowMs;
+          }
+        } else if (stage === 'notice') {
+          emoteSymbol = '!';
+          gesture = 'notice';
+          if (elapsedStage > 450) {
+            isSeated = false;
+            facing = 'right';
+            charY = STAND_RIGHT_Y - 3;
+          }
+          if (elapsedStage >= 1350) {
+            stage = 'walk_right';
+            stageStartMs = nowMs;
+            emoteSymbol = '';
+          }
+        } else if (stage === 'walk_right') {
+          isSeated = false;
+          facing = 'right';
+          gesture = 'walk';
+          const p = Math.min(1, elapsedStage / 1700);
+          charX = THRONE_X + p * (STAND_RIGHT_X - THRONE_X);
+          charY = STAND_RIGHT_Y - Math.abs(Math.sin(p * Math.PI * 6)) * 3;
+
+          if (p >= 1) {
+            stage = 'shock_rocket';
+            stageStartMs = nowMs;
+          }
+        } else if (stage === 'shock_rocket') {
+          isSeated = false;
+          facing = 'right';
+          gesture = 'shock';
+          charX = STAND_RIGHT_X;
+          charY = STAND_RIGHT_Y - (elapsedStage < 280 ? Math.sin((elapsedStage / 280) * Math.PI) * 8 : 0);
+          emoteSymbol = '!!';
+
+          if (elapsedStage >= 1550) {
+            stage = 'speaking_intro';
+            stageStartMs = nowMs;
+            emoteSymbol = '';
+            facing = 'front';
+            startScriptLine(0, nowMs);
+          }
+        } else if (stage === 'speaking_intro') {
+          isSeated = false;
+          facing = 'front';
+          charX = STAND_RIGHT_X;
+          charY = STAND_RIGHT_Y;
+
+          const done = updateSynchronizedDialogue(nowMs);
+          if (done) {
+            stage = 'tablet_scanning';
+            stageStartMs = nowMs;
+            gesture = 'tablet_scan';
+            isTalkingSyllable = false;
+            if (dialogueTagEl) dialogueTagEl.textContent = '[ TABLET SCANNER // ACTIVE ]';
+            if (dialogueTextEl) {
+              dialogueTextEl.textContent = 'Memindai data perangkat & email pengunjung...';
+            }
+          }
+        } else if (stage === 'tablet_scanning') {
+          isSeated = false;
+          facing = 'front';
+          gesture = 'tablet_scan';
+          charX = STAND_RIGHT_X;
+          charY = STAND_RIGHT_Y;
+
+          if (elapsedStage >= 2600) {
+            stage = 'speaking_reveal';
+            stageStartMs = nowMs;
+            startScriptLine(1, nowMs);
+          }
+        } else if (stage === 'speaking_reveal') {
+          isSeated = false;
+          facing = 'front';
+          charX = STAND_RIGHT_X;
+          charY = STAND_RIGHT_Y;
+
+          const lineDone = updateSynchronizedDialogue(nowMs);
+          if (lineDone) {
+            if (activeLineIndex < scriptLines.length - 1) {
+              startScriptLine(activeLineIndex + 1, nowMs);
+            } else {
+              stage = 'idle';
+              stageStartMs = nowMs;
+              gesture = 'idle';
+              isTalkingSyllable = false;
+              dialogueBoxEl?.classList.remove('is-visible');
+              window.dispatchEvent(
+                new CustomEvent('vaskrona:trigger-achievement', {
+                  detail: { current: visitor, list: visitorsList },
+                })
+              );
+            }
+          }
+        } else {
+          isSeated = false;
+          facing = 'front';
+          gesture = 'idle';
+          isTalkingSyllable = false;
+          charX = STAND_RIGHT_X;
+          charY = STAND_RIGHT_Y;
+        }
+      }
+
+      /**
+       * Draws the Multi-Monitor Coding Workstation & Cyber Desk (`x = 10..245`).
+       */
+      function drawWorkstation(tSec: number) {
+        const floatA = Math.round(Math.sin(tSec * 2.2) * 2);
+        const floatB = Math.round(Math.cos(tSec * 2.2) * 2);
+
+        // 1. Upper-Left Small Floating Screen
+        const ulX = 16;
+        const ulY = 54 + floatA;
+        px(ulX - 1, ulY - 1, 52, 34, '#525252');
+        px(ulX, ulY, 50, 32, '#0a0a0a');
+        px(ulX + 2, ulY + 2, 46, 5, '#1a1a1a');
+        px(ulX + 4, ulY + 3, 20, 2, '#a3a3a3');
+        px(ulX + 4, ulY + 11, 32, 2, '#d4d4d4');
+        px(ulX + 4, ulY + 16, 22, 2, '#737373');
+        px(ulX + 4, ulY + 21, 16 + (Math.floor(tSec * 5) % 14), 2, '#ffffff');
+        px(ulX + 4, ulY + 26, 26, 2, '#525252');
+
+        // 2. Lower-Left Small Floating Screen
+        const llX = 10;
+        const llY = 98 + floatB;
+        px(llX - 1, llY - 1, 52, 34, '#525252');
+        px(llX, llY, 50, 32, '#0a0a0a');
+        px(llX + 2, llY + 2, 46, 5, '#1a1a1a');
+        px(llX + 6, llY + 11, 10, 6, '#a3a3a3');
+        px(llX + 20, llY + 11, 10, 6, '#a3a3a3');
+        px(llX + 34, llY + 11, 10, 6, '#a3a3a3');
+        px(llX + 16, llY + 22, 18, 6, '#ffffff');
+        px(llX + 11, llY + 17, 1, 5, '#525252');
+        px(llX + 25, llY + 17, 1, 5, '#525252');
+        px(llX + 39, llY + 17, 1, 5, '#525252');
+
+        // 3. LARGE MAIN PORTFOLIO MONITOR (Center-Left)
+        const mX = 70;
+        const mY = 44;
+        px(mX - 2, mY - 2, 118, 70, '#262626');
+        px(mX - 1, mY - 1, 116, 68, '#a3a3a3');
+        px(mX, mY, 114, 66, '#080808');
+        px(mX + 2, mY + 2, 110, 7, '#171717');
+        px(mX + 5, mY + 4, 48, 3, '#e5e5e5');
+        px(mX + 92, mY + 4, 16, 3, '#737373');
+
+        // Left pane: Live Code Editor
+        px(mX + 3, mY + 11, 66, 52, '#0d0d0d');
+        const codeWidths = [40, 50, 32, 54, 26, 46, 38, 48];
+        const activeRow = Math.floor(tSec * 2.2) % codeWidths.length;
+        for (let r = 0; r < codeWidths.length; r++) {
+          const ry = mY + 14 + r * 6;
+          px(mX + 6, ry, 3, 2, '#404040');
+          const fullW = codeWidths[r];
+          const w = r === activeRow ? (Math.floor(tSec * 24) % fullW) + 3 : fullW;
+          px(mX + 12, ry, w, 2, r === activeRow ? '#ffffff' : '#8a8a8a');
+          if (r === activeRow && Math.floor(tSec * 6) % 2 === 0) {
+            px(mX + 14 + w, ry, 2, 3, '#ffffff');
+          }
+        }
+
+        // Right pane: Portfolio Preview
+        px(mX + 72, mY + 11, 39, 52, '#111111');
+        px(mX + 75, mY + 14, 33, 14, '#1c1c1c');
+        px(mX + 78, mY + 17, 18, 3, '#ffffff');
+        px(mX + 78, mY + 22, 12, 2, '#737373');
+        px(mX + 75, mY + 32, 9, 9, '#262626');
+        px(mX + 87, mY + 32, 9, 9, '#404040');
+        px(mX + 99, mY + 32, 9, 9, '#262626');
+        px(mX + 75, mY + 47, 33, 4, '#1f1f1f');
+        const barW = 8 + (Math.floor(tSec * 14) % 25);
+        px(mX + 75, mY + 47, barW, 4, '#e5e5e5');
+
+        // 4. Upper-Right Small Floating Screen
+        const urX = 192;
+        const urY = 54 - floatA;
+        px(urX - 1, urY - 1, 50, 32, '#525252');
+        px(urX, urY, 48, 30, '#0a0a0a');
+        px(urX + 2, urY + 2, 44, 5, '#1a1a1a');
+        px(urX + 18, urY + 10, 12, 12, '#262626');
+        px(urX + 20, urY + 12, 8, 8, '#0a0a0a');
+        const sweepX = urX + 23 + Math.round(Math.cos(tSec * 3.2) * 4);
+        const sweepY = urY + 15 + Math.round(Math.sin(tSec * 3.2) * 4);
+        px(sweepX, sweepY, 2, 2, '#ffffff');
+
+        // 5. Lower-Right Small Floating Screen
+        const lrX = 195;
+        const lrY = 96 - floatB;
+        px(lrX - 1, lrY - 1, 50, 32, '#525252');
+        px(lrX, lrY, 48, 30, '#0a0a0a');
+        px(lrX + 2, lrY + 2, 44, 5, '#1a1a1a');
+        for (let b = 0; b < 7; b++) {
+          const bh = 4 + Math.floor(Math.abs(Math.sin(tSec * 5 + b)) * 12) + ((b * 3) % 5);
+          px(lrX + 6 + b * 6, lrY + 26 - bh, 3, bh, b % 2 === 0 ? '#e5e5e5' : '#737373');
+        }
+
+        // 6. Cyber Desk & Glowing Mechanical Keyboard (Matched to seated elbow level `DESK_Y = 182`)
+        const dX = 76;
+        const dY = DESK_Y;
+        px(dX + 8, dY + 6, 5, 34, '#121212');
+        px(dX + 91, dY + 6, 5, 34, '#121212');
+        px(dX + 3, dY + 38, 15, 3, '#262626');
+        px(dX + 86, dY + 38, 15, 3, '#262626');
+        px(dX - 2, dY, 108, 6, '#171717');
+        px(dX - 2, dY, 108, 2, '#a3a3a3');
+        px(dX, dY + 3, 104, 1, '#404040');
+        // Wide Glowing Mechanical Keyboard on top of Desk (`dY - 4`)
+        px(THRONE_X - 22, dY - 4, 44, 4, '#262626');
+        px(THRONE_X - 21, dY - 4, 42, 1, '#737373');
+        const activeKey = Math.floor(tSec * 16) % 8;
+        for (let k = 0; k < 8; k++) {
+          px(THRONE_X - 19 + k * 5, dY - 3, 3, 2, k === activeKey ? '#ffffff' : '#525252');
+        }
+      }
+
+      /**
+       * Draws the compact pedestal & seat cushion of the Small Throne ("tahkta kecil").
+       */
+      function drawSmallThroneSeatBase(tx: number, ty: number) {
+        px(tx - 14, ty - 3, 28, 3, '#18181f');
+        px(tx - 14, ty - 3, 28, 1, '#52525b');
+        px(tx - 10, ty - 13, 20, 10, '#101015');
+        px(tx - 15, ty - 17, 30, 4, '#1f1f27');
+        px(tx - 15, ty - 17, 30, 1, '#71717a');
+      }
+
+      /**
+       * Draws the compact low-profile Backrest, Crown Points & Armrests of the Small Throne ("tahkta kecil").
+       * When the character is seated facing the desk, this is drawn OVER the character's lower waist/hips/legs
+       * so the character is genuinely occluded by the seat/backrest as if sitting inside the small throne!
+       */
+      function drawSmallThroneBackrest(tx: number, ty: number) {
+        // Compact backrest (`28px` wide, top at `ty - 32` — mid-back height so shoulders & collar rise clearly above it)
+        opx(tx - 14, ty - 32, 28, 16, '#121217', '#08080c');
+        px(tx - 15, ty - 31, 1, 14, '#52525b');
+        px(tx + 14, ty - 31, 1, 14, '#52525b');
+        px(tx - 14, ty - 33, 28, 1, '#a1a1aa');
+
+        // Tufted dark cushion panel
+        px(tx - 11, ty - 30, 22, 12, '#1a1a22');
+        px(tx - 1, ty - 29, 2, 10, '#272732');
+        px(tx - 9, ty - 24, 18, 1, '#272732');
+
+        // 3 Small Crown Points on top of the compact throne (`ty - 36`)
+        px(tx - 2, ty - 35, 4, 2, '#71717a');
+        px(tx - 1, ty - 37, 2, 2, '#e4e4e7');
+        px(tx - 12, ty - 35, 3, 2, '#52525b');
+        px(tx - 11, ty - 36, 2, 1, '#d4d4d8');
+        px(tx + 9, ty - 35, 3, 2, '#52525b');
+        px(tx + 9, ty - 36, 2, 1, '#d4d4d8');
+
+        // Compact Left & Right Armrests (`ty - 24`)
+        opx(tx - 17, ty - 23, 4, 7, '#181820', '#08080c');
+        px(tx - 17, ty - 24, 4, 1, '#a1a1aa');
+        opx(tx + 13, ty - 23, 4, 7, '#181820', '#08080c');
+        px(tx + 13, ty - 24, 4, 1, '#a1a1aa');
+      }
+
+      /**
+       * Draws the 100% Custom Handcrafted Chibi Pixel Character.
+       */
+      function drawCustomChibiCharacter(tSec: number) {
+        const cx = Math.round(charX);
+        const cy = Math.round(charY);
+
+        const breatheY = isSeated ? 0 : Math.round(Math.sin(tSec * 2.8) * 1);
+        const talkBounceY = isTalkingSyllable ? (talkSyllableTick % 2 === 0 ? -1 : 0) : 0;
+        const haloBobY = Math.round(Math.sin(tSec * 3.8) * 2) + (gesture === 'shock' || gesture === 'notice' ? -3 : 0);
+        const wingFlap = Math.round(
+          Math.sin(tSec * (gesture === 'shock' ? 15 : gesture === 'walk' ? 11 : 3.2)) *
+            (gesture === 'shock' ? 4 : gesture === 'walk' ? 3 : 2)
+        );
+        const coatSway = gesture === 'walk'
+          ? Math.round(Math.sin(tSec * 12) * 2)
+          : Math.round(Math.sin(tSec * 2.2) * 1);
+
+        const baseFeetY = cy;
+        const torsoTopY = baseFeetY - (isSeated ? 46 : 44) + breatheY + talkBounceY;
+        const headCenterY = torsoTopY - 19 + talkBounceY;
+        const wy = torsoTopY + 3;
+        const dyFlap = wingFlap;
+
+        // Helper for drawing wings (used in both seated and standing modes)
+        function drawCharacterWings() {
+          // A. DEMON WING (Viewer's Left / Character's Right)
+          pxPoly(
+            [
+              [cx - 8, wy + 2],
+              [cx - 17, wy - 4 + dyFlap * 0.5],
+              [cx - 25, wy - 14 + dyFlap],
+              [cx - 29, wy - 15 + dyFlap],
+              [cx - 35, wy - 12 + dyFlap],
+              [cx - 30, wy - 10 + dyFlap],
+              [cx - 38, wy + 2 + dyFlap],
+              [cx - 43, wy + 17 + dyFlap],
+              [cx - 41, wy + 29 + dyFlap],
+              [cx - 35, wy + 21 + dyFlap],
+              [cx - 29, wy + 28 + dyFlap],
+              [cx - 23, wy + 19 + dyFlap * 0.7],
+              [cx - 18, wy + 23 + dyFlap * 0.5],
+              [cx - 10, wy + 12],
+            ],
+            '#1b1822',
+            '#08080c'
+          );
+          pxPoly(
+            [
+              [cx - 28, wy - 8 + dyFlap],
+              [cx - 36, wy + 3 + dyFlap],
+              [cx - 39, wy + 25 + dyFlap],
+              [cx - 35, wy + 19 + dyFlap],
+              [cx - 30, wy + 24 + dyFlap],
+            ],
+            '#681a26'
+          );
+          pxPoly(
+            [
+              [cx - 25, wy - 7 + dyFlap],
+              [cx - 28, wy + 23 + dyFlap],
+              [cx - 23, wy + 17 + dyFlap * 0.7],
+              [cx - 19, wy + 20 + dyFlap * 0.5],
+              [cx - 17, wy + 4 + dyFlap * 0.4],
+            ],
+            '#7c202f'
+          );
+          pxPoly(
+            [
+              [cx - 17, wy + 1 + dyFlap * 0.4],
+              [cx - 18, wy + 18 + dyFlap * 0.5],
+              [cx - 11, wy + 11],
+              [cx - 10, wy + 4],
+            ],
+            '#52141e'
+          );
+          pxLine(cx - 26, wy - 12 + dyFlap, cx - 29, wy + 26 + dyFlap, 2, '#1f1c28');
+          pxLine(cx - 24, wy - 9 + dyFlap, cx - 18, wy + 21 + dyFlap * 0.5, 2, '#1f1c28');
+          pxLine(cx - 17, wy - 3 + dyFlap * 0.5, cx - 26, wy - 13 + dyFlap, 1, '#383346');
+
+          // B. ANGEL WING (Viewer's Right / Character's Left)
+          pxPoly(
+            [
+              [cx + 9, wy + 1],
+              [cx + 18, wy - 2 - dyFlap * 0.4],
+              [cx + 26, wy + 5 - dyFlap * 0.7],
+              [cx + 32, wy + 14 - dyFlap],
+              [cx + 28, wy + 14 - dyFlap],
+              [cx + 34, wy + 23 - dyFlap],
+              [cx + 30, wy + 23 - dyFlap],
+              [cx + 35, wy + 34 - dyFlap],
+              [cx + 26, wy + 26 - dyFlap * 0.8],
+              [cx + 21, wy + 28 - dyFlap * 0.6],
+              [cx + 18, wy + 22 - dyFlap * 0.5],
+              [cx + 12, wy + 16],
+            ],
+            '#f5f4fa',
+            '#08080c'
+          );
+          pxPoly(
+            [
+              [cx + 12, wy + 4],
+              [cx + 22, wy + 8 - dyFlap * 0.6],
+              [cx + 26, wy + 18 - dyFlap * 0.8],
+              [cx + 16, wy + 15 - dyFlap * 0.4],
+            ],
+            '#cbc6dc'
+          );
+          pxLine(cx + 16, wy + 10 - dyFlap * 0.4, cx + 28, wy + 22 - dyFlap * 0.8, 1, '#b0a9c4');
+          pxLine(cx + 19, wy + 6 - dyFlap * 0.4, cx + 31, wy + 19 - dyFlap * 0.8, 1, '#ffffff');
+        }
+
+        if (isSeated && facing === 'back_left') {
+          // ============================================================
+          // SEATED CODING MODE (Facing the Desk/Monitors, Seated Inside the Small Throne)
+          // ============================================================
+          // 1. Draw Forward-Reaching Arms & Hands Typing on Keyboard FIRST (in front of torso!)
+          const tL = (Math.floor(tSec * 18) % 2) * 2;
+          const tR = ((Math.floor(tSec * 18) + 1) % 2) * 2;
+
+          // Left shoulder/sleeve angling forward toward the keyboard (`DESK_Y - 4`)
+          pxLine(cx - 9, torsoTopY + 3, cx - 14, torsoTopY + 5, 6, '#08080c');
+          pxLine(cx - 14, torsoTopY + 5, cx - 14, DESK_Y - 4 - tL, 6, '#08080c');
+          pxLine(cx - 9, torsoTopY + 3, cx - 13, torsoTopY + 5, 4, '#f2f0f7');
+          pxLine(cx - 13, torsoTopY + 5, cx - 14, DESK_Y - 4 - tL, 4, '#181720');
+          opx(cx - 16, DESK_Y - 6 - tL, 4, 3, '#ebd0cc');
+
+          // Right shoulder/sleeve angling forward toward the keyboard (`DESK_Y - 4`)
+          pxLine(cx + 9, torsoTopY + 3, cx + 14, torsoTopY + 5, 6, '#08080c');
+          pxLine(cx + 14, torsoTopY + 5, cx + 14, DESK_Y - 4 - tR, 6, '#08080c');
+          pxLine(cx + 9, torsoTopY + 3, cx + 13, torsoTopY + 5, 4, '#f2f0f7');
+          pxLine(cx + 13, torsoTopY + 5, cx + 14, DESK_Y - 4 - tR, 4, '#181720');
+          opx(cx + 12, DESK_Y - 6 - tR, 4, 3, '#ebd0cc');
+
+          // 2. Draw Back of Upper Torso & High Collar (occluding inner arm joints so arms go forward!)
+          opx(cx - 11, torsoTopY - 4, 22, 6, '#181720');
+          px(cx - 11, torsoTopY - 5, 22, 1, '#f2f0f7');
+          opx(cx - 9, torsoTopY + 1, 18, 16, '#181720');
+          px(cx, torsoTopY + 2, 1, 15, '#08080c');
+          px(cx - 5, torsoTopY + 4, 1, 10, '#2a2836');
+          px(cx + 5, torsoTopY + 4, 1, 10, '#2a2836');
+
+          // 3. Draw Small Throne Backrest & Armrests OVER the character's lower back/hips/legs
+          //    so the character is genuinely occluded by the seat ("kehalangan tempat duduk nya")!
+          drawSmallThroneBackrest(THRONE_X, THRONE_Y);
+
+          // 4. Draw Demon & Angel Wings emerging from upper back above the small throne
+          drawCharacterWings();
+        } else {
+          // ============================================================
+          // STANDING / WALKING / SPEAKING / IDLE MODE
+          // ============================================================
+          // Ground shadow under boots
+          px(cx - 24, baseFeetY - 2, 48, 5, 'rgba(0, 0, 0, 0.72)');
+          px(cx - 18, baseFeetY - 1, 36, 3, 'rgba(0, 0, 0, 0.9)');
+
+          // 1. Wings behind body
+          drawCharacterWings();
+
+          // 2. Flared Split Layered Coattails
+          const coatTopY = torsoTopY + 12;
+          const coatBottomY = baseFeetY - 4;
+
+          pxPoly(
+            [
+              [cx - 9, coatTopY],
+              [cx - 15 + coatSway, coatTopY + 10],
+              [cx - 30 + coatSway, coatBottomY - 4],
+              [cx - 24 + coatSway, coatBottomY - 2],
+              [cx - 22 + coatSway, coatBottomY + 1],
+              [cx - 16 + coatSway, coatBottomY - 1],
+              [cx - 13 + coatSway, coatBottomY + 3],
+              [cx - 6, coatBottomY - 10],
+            ],
+            '#181720',
+            '#08080c'
+          );
+          pxLine(cx - 13, coatTopY + 6, cx - 23 + coatSway, coatBottomY - 4, 2, '#282634');
+
+          pxPoly(
+            [
+              [cx + 9, coatTopY],
+              [cx + 14 + coatSway, coatTopY + 10],
+              [cx + 25 + coatSway, coatBottomY - 2],
+              [cx + 20 + coatSway, coatBottomY],
+              [cx + 17 + coatSway, coatBottomY - 4],
+              [cx + 14 + coatSway, coatBottomY + 2],
+              [cx + 6, coatBottomY - 10],
+            ],
+            '#181720',
+            '#08080c'
+          );
+
+          // 3. Fitted Black Trousers & Studded Black Boots
+          const stepL = gesture === 'walk' ? Math.round(Math.sin(tSec * 14) * 3) : 0;
+          const stepR = gesture === 'walk' ? -stepL : 0;
+          const legTopY = torsoTopY + 18;
+
+          const lFootY = baseFeetY + Math.min(0, stepL);
+          opx(cx - 8, legTopY, 6, lFootY - legTopY - 9, '#16151c');
+          px(cx - 6, legTopY + 2, 2, 7, '#2e2c3a');
+          opx(cx - 9, lFootY - 10, 7, 9, '#100f15');
+          opx(cx - 10, lFootY - 4, 9, 4, '#14131a');
+          px(cx - 8, lFootY - 3, 4, 1, '#2c2a38');
+          px(cx - 8, lFootY - 9, 1, 1, '#e6e4f0');
+          px(cx - 6, lFootY - 9, 1, 1, '#e6e4f0');
+          px(cx - 4, lFootY - 9, 1, 1, '#e6e4f0');
+
+          const rFootY = baseFeetY + Math.min(0, stepR);
+          opx(cx + 2, legTopY, 6, rFootY - legTopY - 9, '#16151c');
+          px(cx + 4, legTopY + 2, 2, 7, '#2e2c3a');
+          opx(cx + 2, rFootY - 10, 7, 9, '#100f15');
+          opx(cx + 2, rFootY - 4, 9, 4, '#14131a');
+          px(cx + 5, rFootY - 3, 4, 1, '#2c2a38');
+          px(cx + 3, rFootY - 9, 1, 1, '#e6e4f0');
+          px(cx + 5, rFootY - 9, 1, 1, '#e6e4f0');
+          px(cx + 7, rFootY - 9, 1, 1, '#e6e4f0');
+
+          // 4. Torso, Neck, V-Emblem, Belt & Continuous White Lapel Trim
+          opx(cx - 3, torsoTopY - 4, 6, 5, '#e8c4b8');
+          opx(cx - 8, torsoTopY, 16, 18, '#181720');
+          pxLine(cx - 3, torsoTopY + 2, cx, torsoTopY + 5, 1, '#e6e4f0');
+          pxLine(cx + 3, torsoTopY + 2, cx, torsoTopY + 5, 1, '#e6e4f0');
+          px(cx, torsoTopY + 8, 1, 1, '#9ca3af');
+          px(cx, torsoTopY + 11, 1, 1, '#9ca3af');
+
+          opx(cx - 7, torsoTopY + 14, 14, 3, '#0e0d12');
+          px(cx - 2, torsoTopY + 13, 5, 4, '#f2f0f7');
+          px(cx - 1, torsoTopY + 14, 3, 2, '#14131a');
+
+          pxPoly(
+            [
+              [cx - 12, torsoTopY - 4],
+              [cx - 4, torsoTopY - 3],
+              [cx - 5, torsoTopY + 3],
+              [cx - 10, torsoTopY + 2],
+            ],
+            '#181720',
+            '#08080c'
+          );
+          pxPoly(
+            [
+              [cx + 12, torsoTopY - 4],
+              [cx + 4, torsoTopY - 3],
+              [cx + 5, torsoTopY + 3],
+              [cx + 10, torsoTopY + 2],
+            ],
+            '#181720',
+            '#08080c'
+          );
+
+          pxLine(cx - 11, torsoTopY - 4, cx - 5, torsoTopY - 3, 1, '#f2f0f7');
+          pxLine(cx - 5, torsoTopY - 3, cx - 6, coatTopY + 2, 2, '#f2f0f7');
+          pxLine(cx - 6, coatTopY + 2, cx - 12 + coatSway, coatBottomY + 1, 2, '#f2f0f7');
+
+          pxLine(cx + 5, torsoTopY - 3, cx + 11, torsoTopY - 4, 1, '#f2f0f7');
+          pxLine(cx + 5, torsoTopY - 3, cx + 6, coatTopY + 2, 2, '#f2f0f7');
+          pxLine(cx + 6, coatTopY + 2, cx + 13 + coatSway, coatBottomY + 1, 2, '#f2f0f7');
+
+          // 5. Chibi Arms & Holographic Scanner Tablet
+          const handBob = isTalkingSyllable ? (talkSyllableTick % 2 === 0 ? -1 : 1) : 0;
+
+          function drawChibiArm(sx: number, sy: number, ex: number, ey: number) {
+            const mx = (sx + ex) / 2;
+            const my = (sy + ey) / 2;
+            pxLine(sx, sy, ex, ey, 7, '#08080c');
+            pxLine(sx, sy, mx, my, 5, '#f2f0f7');
+            px(Math.round(mx) - 2, Math.round(my) - 1, 5, 2, '#14131a');
+            pxLine(mx, my, ex, ey, 5, '#181720');
+            opx(Math.round(ex) - 2, Math.round(ey) - 2, 4, 4, '#ebd0cc');
+          }
+
+          if (gesture === 'shock') {
+            drawChibiArm(cx - 9, torsoTopY + 3, cx - 17, torsoTopY - 4);
+            drawChibiArm(cx + 9, torsoTopY + 3, cx + 17, torsoTopY - 4);
+          } else if (gesture === 'point_warn') {
+            drawChibiArm(cx - 9, torsoTopY + 4, cx - 14, torsoTopY + 14);
+            drawChibiArm(cx + 9, torsoTopY + 4, cx + 19, torsoTopY + 4 + handBob);
+          } else if (gesture === 'arms_crossed') {
+            drawChibiArm(cx - 9, torsoTopY + 4, cx + 4, torsoTopY + 9);
+            drawChibiArm(cx + 9, torsoTopY + 4, cx - 4, torsoTopY + 9);
+          } else if (gesture === 'think_chin') {
+            drawChibiArm(cx - 9, torsoTopY + 4, cx - 14, torsoTopY + 14);
+            drawChibiArm(cx + 9, torsoTopY + 4, cx + 4, torsoTopY - 2);
+          } else if (gesture === 'lean_question') {
+            drawChibiArm(cx - 9, torsoTopY + 4, cx - 17, torsoTopY + 8 + handBob);
+            drawChibiArm(cx + 9, torsoTopY + 4, cx + 17, torsoTopY + 8 - handBob);
+          } else if (
+            gesture === 'tablet_scan' ||
+            gesture === 'tablet_nod' ||
+            gesture === 'tablet_point' ||
+            gesture === 'tablet_read' ||
+            gesture === 'tablet_show'
+          ) {
+            drawChibiArm(cx + 9, torsoTopY + 4, cx + 16, torsoTopY + 7);
+
+            const tabX = cx + 14;
+            const tabY = torsoTopY - 7 + Math.round(Math.sin(tSec * 4) * 1);
+            px(tabX - 2, tabY - 2, 20, 24, 'rgba(229, 229, 229, 0.15)');
+            opx(tabX, tabY, 16, 20, '#d4d4d8');
+            px(tabX + 1, tabY + 1, 14, 18, '#09090d');
+            px(tabX + 2, tabY + 2, 12, 2, '#27272a');
+            px(tabX + 3, tabY + 5, 9, 2, '#e4e4e7');
+            px(tabX + 3, tabY + 8, 10, 1, '#a1a1aa');
+            px(tabX + 3, tabY + 11, 7, 1, '#71717a');
+            px(tabX + 3, tabY + 14, 9, 2, '#ffffff');
+            const scanLineY = tabY + 4 + (Math.floor(tSec * 16) % 13);
+            px(tabX + 2, scanLineY, 12, 1, '#ffffff');
+
+            if (gesture === 'tablet_scan' || gesture === 'tablet_point') {
+              const tapX = gesture === 'tablet_scan' ? (Math.floor(tSec * 14) % 2) * 2 : 0;
+              drawChibiArm(cx - 9, torsoTopY + 4, tabX - 1 + tapX, tabY + 11);
+            } else {
+              drawChibiArm(cx - 9, torsoTopY + 4, cx - 14, torsoTopY + 12 + handBob);
+            }
+          } else {
+            const swing = gesture === 'walk' ? Math.round(Math.sin(tSec * 14) * 3) : 0;
+            drawChibiArm(cx - 9, torsoTopY + 4, cx - 14, torsoTopY + 14 + swing);
+            drawChibiArm(cx + 9, torsoTopY + 4, cx + 14, torsoTopY + 14 - swing);
+          }
+        }
+
+        // ============================================================
+        // 6. BIG EXPRESSIVE CHIBI HEAD, ANIME EYES & SEAMLESS SPLIT HAIR
+        // ============================================================
+        const hx = cx;
+        const hy = headCenterY;
+
+        pxPoly(
+          [
+            [hx - 18, hy - 8],
+            [hx - 12, hy - 18],
+            [hx, hy - 20],
+            [hx + 12, hy - 18],
+            [hx + 18, hy - 8],
+            [hx + 20, hy + 6],
+            [hx + 15, hy + 14],
+            [hx - 15, hy + 14],
+            [hx - 20, hy + 6],
+          ],
+          '#181720',
+          '#08080c'
+        );
+
+        if (facing === 'back_left') {
+          pxPoly(
+            [
+              [hx - 17, hy - 7],
+              [hx - 11, hy - 17],
+              [hx + 1, hy - 19],
+              [hx + 1, hy + 14],
+              [hx - 14, hy + 14],
+              [hx - 19, hy + 5],
+            ],
+            '#1a1822'
+          );
+          pxPoly(
+            [
+              [hx + 1, hy - 19],
+              [hx + 12, hy - 17],
+              [hx + 18, hy - 7],
+              [hx + 19, hy + 5],
+              [hx + 15, hy + 14],
+              [hx + 1, hy + 14],
+            ],
+            '#f5f4fa'
+          );
+          pxLine(hx - 14, hy - 6, hx - 1, hy - 4, 3, '#584c60');
+          for (let sx = -14; sx <= 14; sx += 4) {
+            const spikeCol = sx < 1 ? '#1a1822' : '#dcd8e8';
+            pxPoly(
+              [
+                [hx + sx - 2, hy + 12],
+                [hx + sx + 2, hy + 12],
+                [hx + sx, hy + 16],
+              ],
+              spikeCol,
+              '#08080c'
+            );
+          }
+        } else {
+          const faceShiftX = facing === 'right' ? 2 : 0;
+          opx(hx - 16 + faceShiftX, hy + 4, 3, 5, '#f2d5c9');
+          opx(hx + 13 + faceShiftX, hy + 4, 3, 5, '#f2d5c9');
+
+          pxPoly(
+            [
+              [hx - 13 + faceShiftX, hy - 6],
+              [hx + 13 + faceShiftX, hy - 6],
+              [hx + 13 + faceShiftX, hy + 8],
+              [hx + 8 + faceShiftX, hy + 13],
+              [hx - 8 + faceShiftX, hy + 13],
+              [hx - 13 + faceShiftX, hy + 8],
+            ],
+            '#fcefe9',
+            '#08080c'
+          );
+          px(hx - 7 + faceShiftX, hy + 12, 14, 1, '#f2d5c9');
+          px(hx - 11 + faceShiftX, hy + 8, 3, 2, '#f5b8b0');
+          px(hx + 9 + faceShiftX, hy + 8, 3, 2, '#f5b8b0');
+
+          const blinkCycle = tSec % 3.5;
+          const isBlinking = (stage === 'idle' || stage.startsWith('speaking')) && blinkCycle > 3.32;
+          const gazeX = gesture === 'tablet_scan' || gesture === 'tablet_read' ? 1 : facing === 'right' ? 1 : 0;
+          const lx = hx - 9 + faceShiftX;
+          const rx = hx + 4 + faceShiftX;
+          const ey = hy + 2;
+
+          if (isBlinking) {
+            px(lx, ey + 4, 6, 2, '#14131a');
+            px(rx, ey + 4, 6, 2, '#14131a');
+          } else {
+            for (const ex of [lx, rx]) {
+              px(ex, ey, 6, 6, '#ffffff');
+              px(ex + 1 + gazeX, ey + 1, 4, 5, '#283044');
+              px(ex + 1 + gazeX, ey + 4, 4, 2, '#52668a');
+              px(ex + 2 + gazeX, ey + 2, 2, 2, '#10121a');
+              px(ex, ey, 6, 2, '#100f16');
+              px(ex + 1, ey + 1, 2, 2, '#ffffff');
+              px(ex + 4, ey + 4, 1, 1, '#ffffff');
+            }
+          }
+
+          const mx = hx + faceShiftX;
+          const my = hy + 9;
+          if (gesture === 'shock') {
+            px(mx - 1, my, 4, 3, '#2b141c');
+            px(mx, my + 1, 2, 2, '#a83848');
+          } else if (isTalkingSyllable) {
+            if (talkSyllableTick % 2 === 0) {
+              px(mx - 2, my, 4, 3, '#2b141c');
+              px(mx - 1, my + 1, 2, 2, '#c84b5c');
+            } else {
+              px(mx - 1, my, 3, 2, '#2b141c');
+              px(mx, my + 1, 1, 1, '#d96876');
+            }
+          } else {
+            px(mx - 1, my + 1, 3, 1, '#b86b6b');
+          }
+
+          const leftHairPts: Array<[number, number]> = [
+            [hx - 18, hy - 9],
+            [hx - 12, hy - 18],
+            [hx - 1, hy - 20],
+            [hx + 3, hy - 20],
+            [hx + 3, hy - 1],
+            [hx - 1, hy + 5],
+            [hx - 4, hy],
+            [hx - 5, hy - 6],
+            [hx - 8, hy + 2],
+            [hx - 11, hy - 2],
+            [hx - 11, hy + 12],
+            [hx - 16, hy + 10],
+            [hx - 15, hy + 5],
+            [hx - 22, hy + 4],
+            [hx - 17, hy - 1],
+            [hx - 23, hy - 5],
+          ];
+          const rightHairPts: Array<[number, number]> = [
+            [hx + 2, hy - 19],
+            [hx + 12, hy - 17],
+            [hx + 19, hy - 7],
+            [hx + 23, hy - 1],
+            [hx + 18, hy],
+            [hx + 22, hy + 6],
+            [hx + 17, hy + 5],
+            [hx + 18, hy + 13],
+            [hx + 12, hy + 12],
+            [hx + 11, hy + 1],
+            [hx + 8, hy],
+            [hx + 5, hy + 3],
+            [hx + 3, hy - 2],
+          ];
+
+          pxPoly(leftHairPts, '#1a1822', '#08080c');
+          pxPoly(rightHairPts, '#f5f4fa', '#08080c');
+          pxPoly(leftHairPts, '#1a1822');
+          pxPoly(rightHairPts, '#f5f4fa');
+
+          pxLine(hx + 2, hy - 19, hx + 3, hy - 1, 1, '#08080c');
+          pxLine(hx + 3, hy - 1, hx - 1, hy + 5, 1, '#08080c');
+          pxLine(hx - 1, hy + 5, hx - 4, hy, 1, '#08080c');
+
+          pxLine(hx + 14, hy - 4, hx + 16, hy + 10, 2, '#cbc6dc');
+          pxLine(hx + 6, hy - 14, hx + 15, hy - 4, 2, '#dcd8e8');
+
+          pxLine(hx - 13, hy - 9, hx - 6, hy - 6, 3, '#5e4f68');
+          pxLine(hx - 5, hy - 6, hx + 1, hy - 6, 3, '#736280');
+
+          pxPoly(
+            [
+              [hx - 4, hy - 19],
+              [hx + 4, hy - 22],
+              [hx + 2, hy - 18],
+            ],
+            '#1a1822',
+            '#08080c'
+          );
+        }
+
+        // ============================================================
+        // 7. TWO MEDIUM CURVED RIBBED BLACK HORNS
+        // ============================================================
+        pxPoly(
+          [
+            [hx - 12, hy - 10],
+            [hx - 17, hy - 7],
+            [hx - 23, hy - 12],
+            [hx - 24, hy - 20],
+            [hx - 20, hy - 26],
+            [hx - 18, hy - 25],
+            [hx - 18, hy - 18],
+            [hx - 14, hy - 14],
+          ],
+          '#18161f',
+          '#08080c'
+        );
+        pxLine(hx - 21, hy - 19, hx - 18, hy - 17, 1, '#3d384a');
+        pxLine(hx - 20, hy - 15, hx - 16, hy - 13, 1, '#3d384a');
+        pxLine(hx - 18, hy - 11, hx - 14, hy - 10, 1, '#2d2938');
+
+        pxPoly(
+          [
+            [hx + 12, hy - 10],
+            [hx + 17, hy - 7],
+            [hx + 23, hy - 12],
+            [hx + 24, hy - 20],
+            [hx + 20, hy - 26],
+            [hx + 18, hy - 25],
+            [hx + 18, hy - 18],
+            [hx + 14, hy - 14],
+          ],
+          '#18161f',
+          '#08080c'
+        );
+        pxLine(hx + 18, hy - 17, hx + 21, hy - 19, 1, '#3d384a');
+        pxLine(hx + 16, hy - 13, hx + 20, hy - 15, 1, '#3d384a');
+        pxLine(hx + 14, hy - 10, hx + 18, hy - 11, 1, '#2d2938');
+
+        // ============================================================
+        // 8. FLOATING WHITE HALO
+        // ============================================================
+        const haloY = hy - 30 + haloBobY;
+        px(hx - 11, haloY - 1, 22, 6, '#08080c');
+        px(hx - 13, haloY, 26, 4, '#08080c');
+        px(hx - 10, haloY, 20, 4, '#ffffff');
+        px(hx - 12, haloY + 1, 24, 2, '#ffffff');
+        px(hx - 7, haloY + 1, 14, 2, '#7c7a88');
+        px(hx - 5, haloY + 1, 10, 1, '#27262e');
+
+        // ============================================================
+        // 9. PIXEL EMOTE BUBBLE ("!" / "!!")
+        // ============================================================
+        if (emoteSymbol !== '') {
+          const bx = hx - 9;
+          const by = haloY - 18;
+          opx(bx, by, 18, 14, '#0a0a0e', '#ffffff');
+          if (emoteSymbol === '!') {
+            px(bx + 8, by + 2, 2, 6, '#ffffff');
+            px(bx + 8, by + 10, 2, 2, '#ffffff');
+          } else {
+            px(bx + 5, by + 2, 2, 6, '#ffffff');
+            px(bx + 5, by + 10, 2, 2, '#ffffff');
+            px(bx + 11, by + 2, 2, 6, '#ffffff');
+            px(bx + 11, by + 10, 2, 2, '#ffffff');
+          }
+        }
+      }
+
+      let animFrameId = 0;
+      function renderLoop(nowMs: number) {
+        animFrameId = requestAnimationFrame(renderLoop);
+        if (!ctx) return;
+
+        const tSec = nowMs / 1000;
+        ctx.clearRect(0, 0, W, H);
+
+        updateTimeline(nowMs);
+
+        // 1. Draw Left-Side Multi-Monitor Coding Workstation & Desk
+        drawWorkstation(tSec);
+
+        // 2. Draw Small Throne Seat Base (and full backrest when character stands up & walks right)
+        drawSmallThroneSeatBase(THRONE_X, THRONE_Y);
+        if (!isSeated) {
+          drawSmallThroneBackrest(THRONE_X, THRONE_Y);
+        }
+
+        // 3. Draw 100% Custom Chibi Pixel Character
+        drawCustomChibiCharacter(tSec);
+      }
+
+      animFrameId = requestAnimationFrame(renderLoop);
+
       window.addEventListener('pagehide', () => {
         cancelAnimationFrame(animFrameId);
-        if (bubbleTimer !== null) window.clearTimeout(bubbleTimer);
-        if (activeBlobUrl) URL.revokeObjectURL(activeBlobUrl);
-        resizeObserver.disconnect();
-        motionMedia.removeEventListener('change', onMotionPrefChange);
-        controlsHandle.dispose();
-        stationHandle.dispose();
-        activeRenderer.dispose();
       });
     }
   }
 </script>
-
