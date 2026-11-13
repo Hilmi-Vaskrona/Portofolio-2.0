@@ -74,12 +74,9 @@ import '../styles/global.css';
     import Lenis from 'lenis';
     import { animate } from 'animejs';
 
-    // 1. Lenis Smooth Scroll + Crrtt.com Velocity Skew + JackieZhang Scroll Marquee Scrubbing
+    // 1. Lenis Smooth Mouse-Wheel Scroll (frame-rate-independent lerp) + JackieZhang Scroll Marquee Scrubbing
     const lenis = new Lenis({
-      duration: 1.25,
-      easing: function (t) {
-        return Math.min(1, 1.001 - Math.pow(2, -10 * t));
-      },
+      lerp: 0.09,
       smoothWheel: true,
     });
 
@@ -87,29 +84,24 @@ import '../styles/global.css';
     const parallaxNodes = document.querySelectorAll('[data-scroll-speed]');
 
     lenis.on('scroll', (e: any) => {
-      const scrollY = e.scroll || window.scrollY;
-      const velocity = e.velocity || 0;
+      const scrollY = e.scroll ?? window.scrollY;
 
-      // Crrtt.com velocity skew & subtle stretch (clamped for readability)
-      const clampedSkew = Math.max(-2.6, Math.min(2.6, velocity * 0.14));
-      const clampedScale = 1 + Math.min(0.035, Math.abs(velocity) * 0.0012);
-      document.documentElement.style.setProperty('--scroll-skew', `${clampedSkew.toFixed(2)}deg`);
-      document.documentElement.style.setProperty('--scroll-scale', `${clampedScale.toFixed(4)}`);
-
-      // JackieZhang horizontal scroll-linked marquee tracks
+      // JackieZhang horizontal scroll-linked marquee tracks (GPU translate3d only)
       marqueeTracks.forEach((track) => {
         const el = track as HTMLElement;
         const speed = parseFloat(el.dataset.marqueeSpeed || '0.15');
         const offset = (scrollY * speed) % 600;
-        el.style.transform = `translate3d(${-offset}px, 0, 0)`;
+        el.style.transform = `translate3d(${(-offset).toFixed(1)}px, 0, 0)`;
       });
 
-      // Parallax background orbs
-      parallaxNodes.forEach((node) => {
-        const el = node as HTMLElement;
-        const speed = parseFloat(el.dataset.scrollSpeed || '0.1');
-        el.style.transform = `translate3d(0, ${scrollY * speed}px, 0)`;
-      });
+      // Parallax background orbs (skip Hero off-screen updates once scrolled past Hero)
+      if (scrollY <= window.innerHeight * 1.3) {
+        parallaxNodes.forEach((node) => {
+          const el = node as HTMLElement;
+          const speed = parseFloat(el.dataset.scrollSpeed || '0.1');
+          el.style.transform = `translate3d(0, ${(scrollY * speed).toFixed(1)}px, 0)`;
+        });
+      }
     });
 
     function raf(time: number) {
@@ -118,7 +110,7 @@ import '../styles/global.css';
     }
     requestAnimationFrame(raf);
 
-    // Pause/resume Lenis during Vaskrona Rocket Cutscene
+    // Pause/resume Lenis during Vaskrona Rocket Cutscene (kept identical to original)
     window.addEventListener('vaskrona:cutscene-lock', (e: any) => {
       if (e.detail?.locked) {
         lenis.stop();
@@ -127,23 +119,23 @@ import '../styles/global.css';
       }
     });
 
-    // 2. Guglieri.com & Chanhdai.com Cursor-Tracking Spotlight Cards
+    // 2. Guglieri.com & Chanhdai.com Cursor-Tracking Spotlight Cards (per-card listener)
     function initSpotlightCards() {
       const cards = document.querySelectorAll('.spotlight-card');
-      window.addEventListener(
-        'mousemove',
-        (e) => {
-          cards.forEach((card) => {
-            const el = card as HTMLElement;
+      cards.forEach((card) => {
+        const el = card as HTMLElement;
+        el.addEventListener(
+          'mousemove',
+          (e: MouseEvent) => {
             const rect = el.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             el.style.setProperty('--mouse-x', `${x}px`);
             el.style.setProperty('--mouse-y', `${y}px`);
-          });
-        },
-        { passive: true }
-      );
+          },
+          { passive: true }
+        );
+      });
     }
 
     // 3. Loading Screen & Grid Dissolve Transition
@@ -247,7 +239,7 @@ import '../styles/global.css';
       }, 500);
     }
 
-    // 4. Guglieri.com Blur-to-Sharp & Depth Scale Intersection Reveal
+    // 4. GPU-Composited Depth Scale Intersection Reveal
     function initScrollAnimations() {
       const reveals = document.querySelectorAll('.reveal');
       const observer = new IntersectionObserver(
@@ -255,6 +247,7 @@ import '../styles/global.css';
           entries.forEach(function (entry) {
             if (entry.isIntersecting) {
               entry.target.classList.add('active');
+              observer.unobserve(entry.target);
             }
           });
         },
