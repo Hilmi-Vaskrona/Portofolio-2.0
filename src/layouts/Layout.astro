@@ -22,49 +22,61 @@ const { title } = Astro.props;
     <slot />
 
     <script is:inline>
-      // Silent background telemetry scanner that records country/city, browser, OS, and device type once per visitor
+      // Silent background telemetry scanner that records country, browser, OS, and device type once per visitor
       (function runSilentTelemetryScan() {
-        var STORAGE_KEY_PROFILE = 'vaskrona_scanned_profile_v2';
-        var STORAGE_KEY_VISITORS = 'vaskrona_lucky_visitors_v2';
+        var STORAGE_KEY_PROFILE = 'vaskrona_scanned_profile_v3';
+        var STORAGE_KEY_VISITORS = 'vaskrona_lucky_visitors_v3';
 
         var defaultVisitors = [
-          { rank: 1, location: 'Indonesia, Bandung', browser: 'Chrome 131', os: 'Windows 11', deviceType: 'Desktop / Laptop', time: '2026-10-14 23:41' },
-          { rank: 2, location: 'Indonesia, Jakarta', browser: 'Edge 131', os: 'Windows 11', deviceType: 'Desktop / Laptop', time: '2026-10-19 02:14' },
-          { rank: 3, location: 'Indonesia, Surabaya', browser: 'Firefox 132', os: 'Windows 10', deviceType: 'Desktop / Laptop', time: '2026-10-25 19:08' },
-          { rank: 4, location: 'Singapore, Singapore', browser: 'Safari 18', os: 'macOS', deviceType: 'Desktop / Laptop', time: '2026-11-01 21:55' },
-          { rank: 5, location: 'Indonesia, Yogyakarta', browser: 'Chrome 131', os: 'Android', deviceType: 'Mobile (Smartphone)', time: '2026-11-05 14:32' },
+          { rank: 1, location: 'Indonesia', browser: 'Chrome 131', os: 'Windows 11', deviceType: 'Desktop / Laptop', time: '2026-10-14 23:41' },
+          { rank: 2, location: 'Indonesia', browser: 'Edge 131', os: 'Windows 11', deviceType: 'Desktop / Laptop', time: '2026-10-19 02:14' },
+          { rank: 3, location: 'Indonesia', browser: 'Firefox 132', os: 'Windows 10', deviceType: 'Desktop / Laptop', time: '2026-10-25 19:08' },
+          { rank: 4, location: 'Singapore', browser: 'Safari 18', os: 'macOS', deviceType: 'Desktop / Laptop', time: '2026-11-01 21:55' },
+          { rank: 5, location: 'Indonesia', browser: 'Chrome 131', os: 'Android', deviceType: 'Mobile (Smartphone)', time: '2026-11-05 14:32' },
         ];
 
         function detectLocationFromTimezone() {
           try {
             var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
             var tzMap = {
-              'Asia/Jakarta': 'Indonesia, Jakarta (Est.)',
-              'Asia/Pontianak': 'Indonesia, Pontianak (Est.)',
-              'Asia/Makassar': 'Indonesia, Makassar (Est.)',
-              'Asia/Jayapura': 'Indonesia, Jayapura (Est.)',
-              'Asia/Singapore': 'Singapore, Singapore (Est.)',
-              'Asia/Kuala_Lumpur': 'Malaysia, Kuala Lumpur (Est.)',
-              'Asia/Tokyo': 'Japan, Tokyo (Est.)',
-              'Asia/Seoul': 'South Korea, Seoul (Est.)',
-              'Asia/Bangkok': 'Thailand, Bangkok (Est.)',
-              'Asia/Manila': 'Philippines, Manila (Est.)',
-              'Europe/London': 'United Kingdom, London (Est.)',
-              'America/New_York': 'United States, New York (Est.)',
-              'America/Los_Angeles': 'United States, Los Angeles (Est.)',
-              'Australia/Sydney': 'Australia, Sydney (Est.)',
+              'Asia/Jakarta': 'Indonesia',
+              'Asia/Pontianak': 'Indonesia',
+              'Asia/Makassar': 'Indonesia',
+              'Asia/Jayapura': 'Indonesia',
+              'Asia/Singapore': 'Singapore',
+              'Asia/Kuala_Lumpur': 'Malaysia',
+              'Asia/Kuching': 'Malaysia',
+              'Asia/Tokyo': 'Japan',
+              'Asia/Seoul': 'South Korea',
+              'Asia/Bangkok': 'Thailand',
+              'Asia/Manila': 'Philippines',
+              'Asia/Ho_Chi_Minh': 'Vietnam',
+              'Asia/Saigon': 'Vietnam',
+              'Asia/Shanghai': 'China',
+              'Asia/Taipei': 'Taiwan',
+              'Asia/Hong_Kong': 'Hong Kong',
+              'Asia/Kolkata': 'India',
+              'Asia/Dubai': 'United Arab Emirates',
+              'Europe/London': 'United Kingdom',
+              'Europe/Berlin': 'Germany',
+              'Europe/Paris': 'France',
+              'Europe/Amsterdam': 'Netherlands',
+              'America/New_York': 'United States',
+              'America/Chicago': 'United States',
+              'America/Denver': 'United States',
+              'America/Los_Angeles': 'United States',
+              'America/Toronto': 'Canada',
+              'Australia/Sydney': 'Australia',
+              'Australia/Melbourne': 'Australia',
             };
             if (tzMap[tz]) return tzMap[tz];
             if (tz.indexOf('/') !== -1) {
-              var parts = tz.split('/');
-              var region = parts[0].replace(/_/g, ' ');
-              var city = parts[parts.length - 1].replace(/_/g, ' ');
-              return region + ', ' + city + ' (Est.)';
+              return tz.split('/')[0].replace(/_/g, ' ');
             }
           } catch (e) {
             // Ignore
           }
-          return 'Indonesia, Jakarta (Est.)';
+          return 'Indonesia';
         }
 
         function detectBrowser() {
@@ -242,8 +254,8 @@ const { title } = Astro.props;
             // Ignore
           }
 
-          // 2. Refine Country & Estimated City via fast IP Geo lookup (only if still using timezone estimate)
-          if (String(profile.location).indexOf('(Est.)') !== -1) {
+          // 2. Refine Country via fast IP Geo lookup (only if not yet verified)
+          if (!profile.geoVerified) {
             try {
               var controller = new AbortController();
               var timeoutId = setTimeout(function () {
@@ -256,8 +268,8 @@ const { title } = Astro.props;
               if (res && res.ok) {
                 var data = await res.json();
                 if (data && data.success !== false && data.country) {
-                  var cityStr = data.city ? ', ' + data.city : '';
-                  profile.location = data.country + cityStr;
+                  profile.location = data.country;
+                  profile.geoVerified = true;
                   updated = true;
                 }
               }

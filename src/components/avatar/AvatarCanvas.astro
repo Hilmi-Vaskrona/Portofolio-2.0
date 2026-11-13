@@ -69,8 +69,8 @@ import '../../styles/avatar.css';
     cues: DialogueCue[];
   }
 
-  const STORAGE_KEY_PROFILE = 'vaskrona_scanned_profile_v2';
-  const STORAGE_KEY_VISITORS = 'vaskrona_lucky_visitors_v2';
+  const STORAGE_KEY_PROFILE = 'vaskrona_scanned_profile_v3';
+  const STORAGE_KEY_VISITORS = 'vaskrona_lucky_visitors_v3';
 
   const canvas = document.getElementById('vaskrona-pixel-canvas') as HTMLCanvasElement | null;
   const dialogueBoxEl = document.getElementById('vaskrona-dialogue-box');
@@ -92,11 +92,11 @@ import '../../styles/avatar.css';
     }
 
     const fallbackList: VisitorRecord[] = [
-      { rank: 1, location: 'Indonesia, Bandung', browser: 'Chrome 131', os: 'Windows 11', deviceType: 'Desktop / Laptop' },
-      { rank: 2, location: 'Indonesia, Jakarta', browser: 'Edge 131', os: 'Windows 11', deviceType: 'Desktop / Laptop' },
-      { rank: 3, location: 'Indonesia, Surabaya', browser: 'Firefox 132', os: 'Windows 10', deviceType: 'Desktop / Laptop' },
-      { rank: 4, location: 'Singapore, Singapore', browser: 'Safari 18', os: 'macOS', deviceType: 'Desktop / Laptop' },
-      { rank: 5, location: 'Indonesia, Yogyakarta', browser: 'Chrome 131', os: 'Android', deviceType: 'Mobile (Smartphone)' },
+      { rank: 1, location: 'Indonesia', browser: 'Chrome 131', os: 'Windows 11', deviceType: 'Desktop / Laptop' },
+      { rank: 2, location: 'Indonesia', browser: 'Edge 131', os: 'Windows 11', deviceType: 'Desktop / Laptop' },
+      { rank: 3, location: 'Indonesia', browser: 'Firefox 132', os: 'Windows 10', deviceType: 'Desktop / Laptop' },
+      { rank: 4, location: 'Singapore', browser: 'Safari 18', os: 'macOS', deviceType: 'Desktop / Laptop' },
+      { rank: 5, location: 'Indonesia', browser: 'Chrome 131', os: 'Android', deviceType: 'Mobile (Smartphone)' },
     ];
 
     try {
@@ -116,7 +116,7 @@ import '../../styles/avatar.css';
 
       const current: VisitorRecord = {
         rank: list.length + 1,
-        location: 'Indonesia, Jakarta (Est.)',
+        location: 'Indonesia',
         browser: 'Web Browser',
         os: 'Windows 10/11',
         deviceType: 'Desktop / Laptop',
@@ -258,7 +258,7 @@ import '../../styles/avatar.css';
             cues: [{ atCharRatio: 0.0, gesture: 'arms_crossed' }],
           },
           {
-            text: 'tapi... ada cara tersembunyi sih masuk ke sini,',
+            text: 'tapi... ada cara tersembunyi sih masuk ke sini',
             tag: '[ HIDDEN ROUTE ]',
             holdAfterMs: 950,
             cues: [{ atCharRatio: 0.0, gesture: 'think_chin' }],
@@ -291,8 +291,8 @@ import '../../styles/avatar.css';
             cues: [{ atCharRatio: 0.0, gesture: 'tablet_point' }],
           },
           {
-            text: `lokasi kamu di "${v.location}", pake browser "${v.browser}"`,
-            tag: '[ LOCATION & BROWSER ]',
+            text: `negara kamu "${v.location}", pake browser "${v.browser}"`,
+            tag: '[ COUNTRY & BROWSER ]',
             holdAfterMs: 1200,
             cues: [{ atCharRatio: 0.0, gesture: 'tablet_read' }],
           },
@@ -499,7 +499,7 @@ import '../../styles/avatar.css';
               isTalkingSyllable = false;
               if (dialogueTagEl) dialogueTagEl.textContent = '[ TABLET SCANNER // ACTIVE ]';
               if (dialogueTextEl) {
-                dialogueTextEl.textContent = 'Memindai lokasi, browser, OS & perangkat...';
+                dialogueTextEl.textContent = 'Memindai negara, browser, OS & perangkat...';
               }
               if (dialogueBoxEl) {
                 dialogueBoxEl.classList.remove('bubble-pop');
