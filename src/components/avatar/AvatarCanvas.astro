@@ -319,7 +319,8 @@ import '../../styles/avatar.css';
         | 'speaking_intro'
         | 'tablet_scanning'
         | 'speaking_reveal'
-        | 'idle';
+        | 'idle'
+        | 'idle_talking';
 
       let stage: SceneStage = 'coding';
       let stageStartMs = performance.now();
@@ -344,6 +345,61 @@ import '../../styles/avatar.css';
       let lastCharTimeMs = 0;
       let lineFinishedAtMs = 0;
       let currentCharDelayMs = 36;
+
+      let idleReactionText = '';
+      let idleReactionTyped = 0;
+      let idleReactionLastCharMs = 0;
+      let idleReactionFinishedMs = 0;
+      let idleClickIndex = 0;
+
+      const idleEasterEggs: Array<{ text: string; gesture: CharacterGesture; emote: '' | '!' | '!!' }> = [
+        { text: 'hei! jangan asal klik-klik ya, aku lagi mantau sistem nih.', gesture: 'point_warn', emote: '!' },
+        { text: 'roket di sebelah masih berasap gara-gara kamu tadi, tau nggak?', gesture: 'arms_crossed', emote: '!!' },
+        { text: 'coba cek terminal CMD di bawah, ketik "help" buat lihat command rahasia!', gesture: 'tablet_show', emote: '' },
+        { text: 'hmm... masih betah aja di goa gelap ini? coba scroll ke bawah deh.', gesture: 'think_chin', emote: '' },
+        { text: 'sistem sektor 00 aman terkendali... kecuali bagian atap yang bolong itu.', gesture: 'lean_question', emote: '!' },
+      ];
+
+      function triggerIdleSpeech(
+        text: string,
+        reactGesture: CharacterGesture = 'point_warn',
+        reactEmote: '' | '!' | '!!' = ''
+      ) {
+        if (stage !== 'idle' && stage !== 'idle_talking') return;
+        const nowMs = performance.now();
+        stage = 'idle_talking';
+        stageStartMs = nowMs;
+        gesture = reactGesture;
+        emoteSymbol = reactEmote;
+        idleReactionText = text;
+        idleReactionTyped = 0;
+        idleReactionLastCharMs = nowMs;
+        idleReactionFinishedMs = 0;
+        isTalkingSyllable = true;
+
+        if (dialogueTextEl) dialogueTextEl.textContent = '';
+        if (dialogueBoxEl) {
+          dialogueBoxEl.classList.add('is-visible');
+          dialogueBoxEl.classList.remove('bubble-pop');
+          void (dialogueBoxEl as HTMLElement).offsetWidth;
+          dialogueBoxEl.classList.add('bubble-pop');
+        }
+      }
+
+      canvas.addEventListener('click', () => {
+        if (stage !== 'idle' && stage !== 'idle_talking') return;
+        const egg = idleEasterEggs[idleClickIndex % idleEasterEggs.length];
+        idleClickIndex += 1;
+        triggerIdleSpeech(egg.text, egg.gesture, egg.emote);
+      });
+
+      window.addEventListener('vaskrona:say', ((e: CustomEvent) => {
+        const text = e.detail?.text;
+        if (!text) return;
+        const reactGesture = (e.detail?.gesture as CharacterGesture) || 'tablet_show';
+        const reactEmote = (e.detail?.emote as '' | '!' | '!!') || '';
+        triggerIdleSpeech(String(text), reactGesture, reactEmote);
+      }) as EventListener);
 
       function startScriptLine(index: number, nowMs: number) {
         const freshGlobal = (window as any).__vaskronaVisitorsData;
@@ -532,11 +588,46 @@ import '../../styles/avatar.css';
               gesture = 'idle';
               isTalkingSyllable = false;
               dialogueBoxEl?.classList.remove('is-visible');
+              canvas?.classList.add('is-idle-interactive');
               window.dispatchEvent(
                 new CustomEvent('vaskrona:trigger-achievement', {
                   detail: { current: visitor, list: visitorsList },
                 })
               );
+            }
+          }
+        } else if (stage === 'idle_talking') {
+          isSeated = false;
+          facing = 'front';
+          charX = STAND_RIGHT_X;
+          charY = STAND_RIGHT_Y;
+
+          if (idleReactionTyped < idleReactionText.length) {
+            const nextChar = idleReactionText[idleReactionTyped];
+            const charDelay = nextChar === ',' || nextChar === '?' || nextChar === '.' ? 150 : 32;
+            if (nowMs - idleReactionLastCharMs >= charDelay) {
+              idleReactionLastCharMs = nowMs;
+              idleReactionTyped += 1;
+              if (dialogueTextEl) {
+                dialogueTextEl.textContent = idleReactionText.slice(0, idleReactionTyped);
+              }
+              if (nextChar === ' ' || nextChar === ',' || nextChar === '?' || nextChar === '.') {
+                isTalkingSyllable = false;
+              } else {
+                isTalkingSyllable = true;
+                talkSyllableTick += 1;
+              }
+            }
+          } else {
+            isTalkingSyllable = false;
+            if (idleReactionFinishedMs === 0) {
+              idleReactionFinishedMs = nowMs;
+            } else if (nowMs - idleReactionFinishedMs >= 2400) {
+              stage = 'idle';
+              stageStartMs = nowMs;
+              gesture = 'idle';
+              emoteSymbol = '';
+              dialogueBoxEl?.classList.remove('is-visible');
             }
           }
         } else {

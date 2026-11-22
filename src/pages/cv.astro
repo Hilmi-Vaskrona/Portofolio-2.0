@@ -1,0 +1,168 @@
+---
+import Layout from '../layouts/Layout.astro';
+import '../styles/global.css';
+---
+
+<Layout title="CV — Hilmi Zaki Ramadhan | Software Engineer & UI/UX Designer">
+  <main class="min-h-screen bg-[#0a0a0a] text-[#e5e5e5] py-10 px-4 sm:px-8 print:bg-white print:text-black print:p-0">
+    <!-- Top Action Bar (Hidden when printing/saving to PDF) -->
+    <div class="mx-auto max-w-4xl mb-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[#262626] bg-[#111111] px-5 py-3.5 font-mono text-xs print:hidden">
+      <a href="/" class="inline-flex items-center gap-2 text-[#a3a3a3] hover:text-[#ffffff] transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span>Kembali ke Portofolio</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <button
+          id="print-cv-btn"
+          type="button"
+          class="inline-flex items-center gap-2 rounded-lg bg-[#e5e5e5] px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider text-[#0a0a0a] hover:bg-[#a3a3a3] transition-colors cursor-pointer"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16V4m0 12l-3.5-3.5M12 16l3.5-3.5M4 20h16" />
+          </svg>
+          <span>Download / Save PDF</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Printable CV Document Sheet -->
+    <article class="mx-auto max-w-4xl rounded-2xl border border-[#262626] bg-[#0f0f12] p-8 sm:p-12 shadow-2xl print:border-none print:bg-white print:text-black print:shadow-none print:p-6">
+      <!-- Header -->
+      <header class="border-b border-[#262626] pb-6 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:border-gray-300">
+        <div>
+          <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-[#ffffff] print:text-black">
+            HILMI ZAKI RAMADHAN
+          </h1>
+          <p class="mt-1 font-mono text-sm text-[#a3a3a3] print:text-gray-700">
+            Software Engineer &bull; Frontend &amp; Fullstack Developer &bull; UI/UX Designer
+          </p>
+        </div>
+        <div class="font-mono text-xs text-[#a3a3a3] space-y-1 sm:text-right print:text-gray-700">
+          <p>Karawang, Jawa Barat, Indonesia</p>
+          <p>
+            <a href="mailto:hilmi08zr@gmail.com" class="hover:text-white underline">hilmi08zr@gmail.com</a>
+          </p>
+          <p>
+            <a href="https://github.com/Hilmi-Vaskrona" target="_blank" rel="noopener noreferrer" class="hover:text-white underline">
+              github.com/Hilmi-Vaskrona
+            </a>
+          </p>
+        </div>
+      </header>
+
+      <!-- Ringkasan Profil -->
+      <section class="mb-7">
+        <h2 class="font-mono text-xs uppercase tracking-[0.25em] text-[#a3a3a3] border-b border-[#262626] pb-1.5 mb-3 print:text-gray-800 print:border-gray-300">
+          01 // Ringkasan Profil
+        </h2>
+        <p class="text-sm leading-relaxed text-[#d4d4d8] print:text-gray-800">
+          Software Engineer dan UI/UX Designer jurusan Rekayasa Perangkat Lunak (RPL) di SMK Madinatul Quran. Berpengalaman membangun aplikasi web fullstack modern (Next.js, React, Astro, Vue.js, NestJS, Laravel, TypeScript), aplikasi mobile lintas platform (Flutter &amp; Dart), serta perancangan antarmuka pengguna (Figma). Berorientasi pada kode yang bersih, performa tinggi, dan pengalaman pengguna yang interaktif.
+        </p>
+      </section>
+
+      <!-- Keahlian Teknis -->
+      <section class="mb-7">
+        <h2 class="font-mono text-xs uppercase tracking-[0.25em] text-[#a3a3a3] border-b border-[#262626] pb-1.5 mb-3 print:text-gray-800 print:border-gray-300">
+          02 // Keahlian Teknis (Skills &amp; Tools)
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+          <div class="rounded-lg border border-[#262626] bg-[#141418] p-3.5 print:border-gray-300 print:bg-gray-50">
+            <p class="font-bold text-[#ffffff] mb-1 print:text-black">FRONTEND &amp; MOBILE</p>
+            <p class="text-[#a3a3a3] print:text-gray-700">HTML5, CSS3, Tailwind CSS, JavaScript (ES6+), TypeScript, Astro, React, Next.js, Vue.js, Flutter, Dart</p>
+          </div>
+          <div class="rounded-lg border border-[#262626] bg-[#141418] p-3.5 print:border-gray-300 print:bg-gray-50">
+            <p class="font-bold text-[#ffffff] mb-1 print:text-black">BACKEND, CLOUD &amp; DESIGN</p>
+            <p class="text-[#a3a3a3] print:text-gray-700">NestJS, Node.js, Laravel, PHP, Firebase (Auth &amp; Firestore), REST API, Git &amp; GitHub, Figma (UI/UX Design &amp; Prototyping)</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pendidikan & Pengalaman Project -->
+      <section class="mb-7">
+        <h2 class="font-mono text-xs uppercase tracking-[0.25em] text-[#a3a3a3] border-b border-[#262626] pb-1.5 mb-3 print:text-gray-800 print:border-gray-300">
+          03 // Pendidikan &amp; Pengalaman Project
+        </h2>
+        <div class="space-y-4 text-sm">
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="font-bold text-[#ffffff] print:text-black">SMK Madinatul Quran — Rekayasa Perangkat Lunak (RPL)</h3>
+              <span class="font-mono text-xs text-[#a3a3a3] print:text-gray-600">2024 &ndash; Sekarang</span>
+            </div>
+            <p class="text-xs text-[#a3a3a3] mt-1 print:text-gray-700">
+              Mempelajari rekayasa perangkat lunak, arsitektur aplikasi web fullstack, pengembangan mobile Flutter, serta desain UI/UX.
+            </p>
+          </div>
+
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="font-bold text-[#ffffff] print:text-black">Fullstack LMS &amp; Nusafone Platform (Next.js, NestJS, TypeScript, Firebase)</h3>
+              <span class="font-mono text-xs text-[#a3a3a3] print:text-gray-600">2025</span>
+            </div>
+            <p class="text-xs text-[#a3a3a3] mt-1 print:text-gray-700">
+              Membangun sistem Learning Management System (Frontend &amp; Backend API dengan NestJS + Next.js), CMS Panel, serta integrasi autentikasi dan database cloud.
+            </p>
+          </div>
+
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="font-bold text-[#ffffff] print:text-black">Web &amp; UI/UX Projects (Bali.Tour, The Parfume, Sabun Kallos, SMK MQ, TCGI)</h3>
+              <span class="font-mono text-xs text-[#a3a3a3] print:text-gray-600">2024 &ndash; 2025</span>
+            </div>
+            <p class="text-xs text-[#a3a3a3] mt-1 print:text-gray-700">
+              Mengembangkan berbagai landing page responsif, platform e-commerce, aplikasi mobile Flutter (Edu-Market &amp; SMK Product App), dan desain sistem UI/UX.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sertifikasi & Penghargaan -->
+      <section>
+        <h2 class="font-mono text-xs uppercase tracking-[0.25em] text-[#a3a3a3] border-b border-[#262626] pb-1.5 mb-3 print:text-gray-800 print:border-gray-300">
+          04 // Sertifikasi &amp; Penghargaan Terverifikasi
+        </h2>
+        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+          <li class="rounded border border-[#262626] bg-[#141418] p-2.5 print:border-gray-300 print:bg-white">
+            <p class="font-bold text-[#ffffff] print:text-black">Belajar Dasar Pemrograman Web</p>
+            <p class="font-mono text-[11px] text-[#a3a3a3] print:text-gray-600">Dicoding Indonesia &bull; Okt 2024</p>
+          </li>
+          <li class="rounded border border-[#262626] bg-[#141418] p-2.5 print:border-gray-300 print:bg-white">
+            <p class="font-bold text-[#ffffff] print:text-black">Belajar Dasar Pemrograman JavaScript</p>
+            <p class="font-mono text-[11px] text-[#a3a3a3] print:text-gray-600">Dicoding Indonesia &bull; Okt 2024</p>
+          </li>
+          <li class="rounded border border-[#262626] bg-[#141418] p-2.5 print:border-gray-300 print:bg-white">
+            <p class="font-bold text-[#ffffff] print:text-black">Implementasi &amp; Simulasi AI &amp; IoT di Lingkungan Sekitar</p>
+            <p class="font-mono text-[11px] text-[#a3a3a3] print:text-gray-600">Telkom Corporate University (myDigiLearn) &bull; Sep 2025</p>
+          </li>
+          <li class="rounded border border-[#262626] bg-[#141418] p-2.5 print:border-gray-300 print:bg-white">
+            <p class="font-bold text-[#ffffff] print:text-black">Mengenal AI &amp; IoT di Kehidupan Nyata</p>
+            <p class="font-mono text-[11px] text-[#a3a3a3] print:text-gray-600">Telkom Corporate University (myDigiLearn) &bull; Sep 2025</p>
+          </li>
+          <li class="rounded border border-[#262626] bg-[#141418] p-2.5 print:border-gray-300 print:bg-white">
+            <p class="font-bold text-[#ffffff] print:text-black">Google I/O Extended Bogor: "Explore The Future Tech"</p>
+            <p class="font-mono text-[11px] text-[#a3a3a3] print:text-gray-600">GDG Bogor &amp; Women Techmakers &bull; 2025</p>
+          </li>
+          <li class="rounded border border-[#262626] bg-[#141418] p-2.5 print:border-gray-300 print:bg-white">
+            <p class="font-bold text-[#ffffff] print:text-black">7th Grand General Assembly — Delegate of Norway (DISEC)</p>
+            <p class="font-mono text-[11px] text-[#a3a3a3] print:text-gray-600">UI MUN Club (Universitas Indonesia) &bull; 2025</p>
+          </li>
+          <li class="rounded border border-[#262626] bg-[#141418] p-2.5 print:border-gray-300 print:bg-white">
+            <p class="font-bold text-[#ffffff] print:text-black">Global Student Certificate: Explore Cultures</p>
+            <p class="font-mono text-[11px] text-[#a3a3a3] print:text-gray-600">Class2Class.org &bull; Okt 2025</p>
+          </li>
+          <li class="rounded border border-[#262626] bg-[#141418] p-2.5 print:border-gray-300 print:bg-white">
+            <p class="font-bold text-[#ffffff] print:text-black">Global Student Certificate: Create Solutions</p>
+            <p class="font-mono text-[11px] text-[#a3a3a3] print:text-gray-600">Class2Class.org &bull; Okt 2025</p>
+          </li>
+        </ul>
+      </section>
+    </article>
+  </main>
+
+  <script>
+    document.getElementById('print-cv-btn')?.addEventListener('click', () => {
+      window.print();
+    });
+  </script>
+</Layout>

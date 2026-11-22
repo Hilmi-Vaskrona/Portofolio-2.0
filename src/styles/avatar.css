@@ -46,6 +46,11 @@
   pointer-events: none;
 }
 
+.vaskrona-pixel-canvas.is-idle-interactive {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 /* Subtle screen light spill on the cave floor */
 .vaskrona-floor-glow {
   position: absolute;
