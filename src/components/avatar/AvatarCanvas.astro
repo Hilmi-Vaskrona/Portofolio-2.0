@@ -29,14 +29,11 @@ import '../../styles/avatar.css';
 </section>
 
 <script>
-  interface VisitorRecord {
-    rank: number;
-    location: string;
-    browser: string;
-    os: string;
-    deviceType: string;
-    isCurrentUser?: boolean;
-  }
+  import {
+    createPreliminaryVisitor,
+    formatRank,
+    type CaveVisitorRecord,
+  } from '../../lib/caveVisitors';
 
   type CharacterFacing = 'back_left' | 'right' | 'front';
 
@@ -68,14 +65,11 @@ import '../../styles/avatar.css';
     cues: DialogueCue[];
   }
 
-  const STORAGE_KEY_PROFILE = 'vaskrona_scanned_profile_v3';
-  const STORAGE_KEY_VISITORS = 'vaskrona_lucky_visitors_v3';
-
   const canvas = document.getElementById('vaskrona-pixel-canvas') as HTMLCanvasElement | null;
   const dialogueBoxEl = document.getElementById('vaskrona-dialogue-box');
   const dialogueTextEl = document.getElementById('vaskrona-dialogue-text');
 
-  function getScannedVisitorIdentity(): { current: VisitorRecord; list: VisitorRecord[] } {
+  function getInitialScannedVisitor(): { current: CaveVisitorRecord; list: CaveVisitorRecord[] } {
     const existingGlobal = (window as any).__vaskronaVisitorsData;
     if (
       existingGlobal &&
@@ -84,60 +78,16 @@ import '../../styles/avatar.css';
       Array.isArray(existingGlobal.list)
     ) {
       return {
-        current: existingGlobal.current as VisitorRecord,
-        list: existingGlobal.list as VisitorRecord[],
+        current: existingGlobal.current as CaveVisitorRecord,
+        list: existingGlobal.list as CaveVisitorRecord[],
       };
     }
 
-    const fallbackList: VisitorRecord[] = [
-      { rank: 1, location: 'Indonesia', browser: 'Chrome 131', os: 'Windows 11', deviceType: 'Desktop / Laptop' },
-      { rank: 2, location: 'Indonesia', browser: 'Edge 131', os: 'Windows 11', deviceType: 'Desktop / Laptop' },
-      { rank: 3, location: 'Indonesia', browser: 'Firefox 132', os: 'Windows 10', deviceType: 'Desktop / Laptop' },
-      { rank: 4, location: 'Singapore', browser: 'Safari 18', os: 'macOS', deviceType: 'Desktop / Laptop' },
-      { rank: 5, location: 'Indonesia', browser: 'Chrome 131', os: 'Android', deviceType: 'Mobile (Smartphone)' },
-    ];
-
-    try {
-      const storedListRaw = localStorage.getItem(STORAGE_KEY_VISITORS);
-      let list: VisitorRecord[] = storedListRaw ? JSON.parse(storedListRaw) : [...fallbackList];
-      if (!Array.isArray(list) || list.length < 5) list = [...fallbackList];
-
-      const storedProfileRaw = localStorage.getItem(STORAGE_KEY_PROFILE);
-      if (storedProfileRaw) {
-        const parsed = JSON.parse(storedProfileRaw) as VisitorRecord;
-        if (parsed && parsed.location && parsed.browser && parsed.os && parsed.deviceType && parsed.rank) {
-          const hasUser = list.some((item) => item.rank === parsed.rank);
-          if (!hasUser) list.push({ ...parsed, isCurrentUser: true });
-          return { current: parsed, list };
-        }
-      }
-
-      const current: VisitorRecord = {
-        rank: list.length + 1,
-        location: 'Indonesia',
-        browser: 'Web Browser',
-        os: 'Windows 10/11',
-        deviceType: 'Desktop / Laptop',
-        isCurrentUser: true,
-      };
-      list.push(current);
-      localStorage.setItem(STORAGE_KEY_VISITORS, JSON.stringify(list));
-      localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(current));
-      return { current, list };
-    } catch {
-      const fallbackCurrent: VisitorRecord = {
-        rank: 6,
-        location: 'Indonesia, Jakarta (Est.)',
-        browser: 'Web Browser',
-        os: 'Windows 10/11',
-        deviceType: 'Desktop / Laptop',
-        isCurrentUser: true,
-      };
-      return {
-        current: fallbackCurrent,
-        list: [...fallbackList, fallbackCurrent],
-      };
-    }
+    const preliminary = createPreliminaryVisitor();
+    return {
+      current: preliminary,
+      list: [preliminary],
+    };
   }
 
   if (canvas) {
@@ -229,19 +179,24 @@ import '../../styles/avatar.css';
         }
       }
 
-      let { current: visitor, list: visitorsList } = getScannedVisitorIdentity();
+      let { current: visitor, list: visitorsList } = getInitialScannedVisitor();
 
-      // Broadcast the visitor list immediately so Section 2 (CMD Visitor List) can render it
-      window.dispatchEvent(
-        new CustomEvent('vaskrona:visitors-ready', {
-          detail: { current: visitor, list: visitorsList },
-        })
-      );
-      (window as any).__vaskronaVisitorsData = { current: visitor, list: visitorsList };
+      window.addEventListener('vaskrona:visitors-ready', ((e: CustomEvent) => {
+        if (e.detail?.current) {
+          visitor = e.detail.current as CaveVisitorRecord;
+        }
+        if (Array.isArray(e.detail?.list)) {
+          visitorsList = e.detail.list as CaveVisitorRecord[];
+        }
+        if (activeLineIndex <= INTRO_LAST_INDEX) {
+          scriptLines = buildScriptLines(visitor);
+        }
+      }) as EventListener);
 
       const INTRO_LAST_INDEX = 4;
 
-      function buildScriptLines(v: VisitorRecord): ScriptLine[] {
+      function buildScriptLines(v: CaveVisitorRecord): ScriptLine[] {
+        const rankLabel = formatRank(v.rank);
         return [
           {
             text: 'elu seharusnya nggak di sini, ini restricted area',
@@ -284,13 +239,13 @@ import '../../styles/avatar.css';
           },
           {
             text: `di sini tercatat kamu orang ke-${v.rank} yang sudah masuk ke sini`,
-            tag: `[ VISITOR #0${v.rank} ]`,
+            tag: `[ VISITOR ${rankLabel} ]`,
             holdAfterMs: 1100,
             cues: [{ atCharRatio: 0.0, gesture: 'tablet_point' }],
           },
           {
-            text: `negara kamu "${v.location}", pake browser "${v.browser}"`,
-            tag: '[ COUNTRY & BROWSER ]',
+            text: `lokasi kamu "${v.location}", pake browser "${v.browser}"`,
+            tag: '[ LOCATION & BROWSER ]',
             holdAfterMs: 1200,
             cues: [{ atCharRatio: 0.0, gesture: 'tablet_read' }],
           },
@@ -404,9 +359,9 @@ import '../../styles/avatar.css';
       function startScriptLine(index: number, nowMs: number) {
         const freshGlobal = (window as any).__vaskronaVisitorsData;
         if (freshGlobal && freshGlobal.current) {
-          visitor = freshGlobal.current as VisitorRecord;
+          visitor = freshGlobal.current as CaveVisitorRecord;
           if (Array.isArray(freshGlobal.list)) {
-            visitorsList = freshGlobal.list as VisitorRecord[];
+            visitorsList = freshGlobal.list as CaveVisitorRecord[];
           }
           scriptLines = buildScriptLines(visitor);
         }

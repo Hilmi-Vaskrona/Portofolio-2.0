@@ -127,13 +127,98 @@ const asgardFoundationPath =
 
 const asgardCitadelPath =
   'M424,266 L432,262 L438,246 L446,262 L456,258 L464,230 L472,258 L480,255 L488,208 L495,250 L500,196 L505,250 L512,208 L520,255 L528,258 L536,230 L544,258 L554,262 L562,246 L568,262 L576,266 Z';
+
+const midBranches = [
+  {
+    side: 'right',
+    branchPath: 'M524,422 C562,418 604,404 642,390',
+    twigPath: 'M578,412 C598,426 616,432 634,430',
+    veinPath: 'M514,438 C538,422 584,408 630,394',
+    clusterPath:
+      'M664,392 C672,378 656,366 640,372 C628,358 604,365 606,382 C596,391 608,405 624,401 C638,408 658,402 664,392 Z',
+    leaves: [
+      'M640,429 C649,422 658,427 653,435 C646,436 640,433 640,429 Z',
+      'M612,379 C607,369 596,367 594,377 C600,382 607,382 612,379 Z',
+      'M658,406 C666,401 673,407 668,414 C662,415 657,410 658,406 Z',
+    ],
+    width: 7,
+    delay: '0.45s',
+  },
+  {
+    side: 'left',
+    branchPath: 'M472,456 C440,454 410,446 384,436',
+    twigPath: 'M426,450 C410,462 396,468 382,466',
+    veinPath: 'M482,472 C460,458 424,448 392,439',
+    clusterPath:
+      'M364,438 C358,426 371,416 384,422 C394,411 414,416 412,430 C420,437 410,448 396,446 C384,451 369,446 364,438 Z',
+    leaves: [
+      'M378,466 C369,461 363,467 368,474 C374,474 378,470 378,466 Z',
+      'M404,458 C409,466 418,465 418,456 C412,453 407,454 404,458 Z',
+    ],
+    width: 6,
+    delay: '0s',
+  },
+  {
+    side: 'left',
+    branchPath: 'M476,396 C460,392 446,386 436,380',
+    twigPath: 'M454,390 C446,398 438,402 430,402',
+    veinPath: 'M484,406 C470,396 452,388 440,382',
+    clusterPath:
+      'M422,381 C419,373 429,366 438,370 C444,364 456,368 455,377 C459,382 453,389 444,388 C436,391 425,387 422,381 Z',
+    leaves: [
+      'M426,402 C419,399 415,404 420,409 C424,409 427,406 426,402 Z',
+      'M446,367 C449,360 457,359 457,366 C453,369 448,369 446,367 Z',
+    ],
+    width: 4.2,
+    delay: '0.75s',
+  },
+];
+
+const canopyLeafSprigs = [
+  { d: 'M186,162 C178,154 188,144 198,149 C202,155 194,164 186,162 Z', delay: '0s' },
+  { d: 'M216,104 C211,94 223,86 232,94 C234,101 224,108 216,104 Z', delay: '0.35s' },
+  { d: 'M284,64 C281,53 295,48 303,56 C302,64 291,69 284,64 Z', delay: '0.7s' },
+  { d: 'M374,40 C373,29 387,27 394,36 C391,44 380,46 374,40 Z', delay: '1.05s' },
+  { d: 'M518,28 C521,18 535,19 539,29 C534,36 523,35 518,28 Z', delay: '0.5s' },
+  { d: 'M638,44 C644,35 658,39 659,49 C652,55 641,52 638,44 Z', delay: '0.9s' },
+  { d: 'M748,86 C756,79 768,86 766,96 C758,99 748,94 748,86 Z', delay: '1.2s' },
+  { d: 'M818,162 C828,158 836,168 830,177 C822,178 815,170 818,162 Z', delay: '0.65s' },
+  { d: 'M252,232 C243,230 242,240 251,244 C258,242 259,234 252,232 Z', delay: '0.25s' },
+  { d: 'M746,232 C755,230 756,240 747,244 C740,242 739,234 746,232 Z', delay: '1.35s' },
+];
+
+const breezeRibbons = [
+  { d: 'M-80,126 C220,88 520,148 840,110 C1120,78 1340,132 1560,96', delay: '0s', duration: '7.8s', opacity: 0.34 },
+  { d: 'M-80,236 C260,198 560,256 880,218 C1160,186 1360,238 1560,206', delay: '-2.6s', duration: '8.6s', opacity: 0.28 },
+  { d: 'M-80,352 C240,316 540,374 860,336 C1140,304 1340,356 1560,324', delay: '-5.1s', duration: '7.4s', opacity: 0.32 },
+  { d: 'M-80,476 C280,442 580,496 900,458 C1180,428 1360,474 1560,444', delay: '-1.4s', duration: '8.8s', opacity: 0.26 },
+  { d: 'M-80,596 C250,564 560,614 880,578 C1160,548 1360,592 1560,564', delay: '-3.8s', duration: '9.4s', opacity: 0.22 },
+];
+
+const flyingBirds = [
+  { y: 78, scale: 0.95, delay: '0s', duration: '18s', flapDur: '0.58s' },
+  { y: 124, scale: 0.72, delay: '-6.5s', duration: '21s', flapDur: '0.52s' },
+  { y: 172, scale: 0.82, delay: '-13s', duration: '19.5s', flapDur: '0.62s' },
+];
+
+const driftingLeaves = [
+  { y: 165, scale: 1, delay: '0s', duration: '11s' },
+  { y: 245, scale: 0.85, delay: '-3.8s', duration: '12.5s' },
+  { y: 335, scale: 0.95, delay: '-7.2s', duration: '10.8s' },
+  { y: 420, scale: 0.8, delay: '-1.9s', duration: '12s' },
+  { y: 505, scale: 0.9, delay: '-5.6s', duration: '11.4s' },
+  { y: 590, scale: 0.75, delay: '-9.1s', duration: '13s' },
+];
 ---
 
 <section id="experience" class="relative overflow-hidden">
   <!-- Chanhdai Section Header Bar -->
   <div class="border-b border-[#262626] px-6 py-3 flex items-center justify-between text-xs font-mono text-[#525252] bg-[#0a0a0a]">
     <span>SEC // 03 &mdash; TIMELINE</span>
-    <span>[ EXPERIENCE.LOG ]</span>
+    <div class="flex items-center gap-3">
+      <span id="ygg-sky-badge" class="text-[11px] text-[#a3a3a3]">[ SKY // LIVE ]</span>
+      <span>[ EXPERIENCE.LOG ]</span>
+    </div>
   </div>
 
   <!-- JackieZhang Kinetic Scroll Marquee Background -->
@@ -148,6 +233,74 @@ const asgardCitadelPath =
     <span class="corner-plus -top-[5px] -left-[5px]"></span>
     <span class="corner-plus -top-[5px] -right-[5px]"></span>
 
+    <!-- Full-Section Real-Time Adaptive Sky Atmosphere (No Inner Box Clipping Lines) -->
+    <div
+      id="ygg-sky-atmosphere"
+      class="pointer-events-none absolute inset-0 z-0 transition-opacity duration-1000"
+    ></div>
+
+    <!-- Full-Width Section Wind Breeze, Flying Birds & Drifting Leaves (Left Edge -> Right Edge) -->
+    <div class="pointer-events-none absolute inset-0 z-25 overflow-hidden" aria-hidden="true">
+      <svg
+        class="w-full h-full"
+        viewBox="0 0 1480 760"
+        preserveAspectRatio="xMidYMid slice"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <linearGradient id="ygg-section-wind-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#a3a3a3" stop-opacity="0" />
+            <stop offset="30%" stop-color="#e5e5e5" stop-opacity="0.38" />
+            <stop offset="68%" stop-color="#ffffff" stop-opacity="0.62" />
+            <stop offset="100%" stop-color="#a3a3a3" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+
+        {breezeRibbons.map((ribbon) => (
+          <path
+            d={ribbon.d}
+            pathLength="1000"
+            class="ygg-breeze-ribbon"
+            stroke="url(#ygg-section-wind-grad)"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            fill="none"
+            style={`--wisp-opacity: ${ribbon.opacity}; animation-delay: ${ribbon.delay}; animation-duration: ${ribbon.duration};`}
+          />
+        ))}
+
+        {driftingLeaves.map((leaf) => (
+          <g
+            class="ygg-drifting-leaf"
+            style={`--leaf-y: ${leaf.y}px; --leaf-scale: ${leaf.scale}; animation-delay: ${leaf.delay}; animation-duration: ${leaf.duration};`}
+          >
+            <path
+              d="M-6,0 C0,-6 10,-3 7,5 C1,7 -5,4 -6,0 Z"
+              fill="#262626"
+              stroke="#a3a3a3"
+              stroke-width="0.9"
+            />
+          </g>
+        ))}
+
+        {flyingBirds.map((bird) => (
+          <g
+            class="ygg-bird-flight"
+            style={`--bird-y: ${bird.y}px; --bird-scale: ${bird.scale}; animation-delay: ${bird.delay}; animation-duration: ${bird.duration};`}
+          >
+            <g class="ygg-bird-body">
+              <path d="M-4,0 Q0,-2 6,-0.5 Q2,1.5 -4,0 Z" fill="#d4d4d4" />
+              <g class="ygg-bird-wing" style={`animation-duration: ${bird.flapDur};`}>
+                <path d="M-1,-0.5 Q3,-9 9,-6 Q4,-2 1,-0.5 Z" fill="#e5e5e5" />
+                <path d="M-2,-0.5 Q-6,-7 -10,-4 Q-6,-1 -1,-0.5 Z" fill="#a3a3a3" />
+              </g>
+            </g>
+          </g>
+        ))}
+      </svg>
+    </div>
+
     <!-- Centered Section Title -->
     <div class="text-center mx-auto max-w-2xl mb-4 reveal velocity-skew">
       <p class="text-xs font-mono text-[#a3a3a3] tracking-[0.3em] uppercase mb-2">My Journey</p>
@@ -158,20 +311,51 @@ const asgardCitadelPath =
 
     <!-- DESKTOP STAGE: Compact Iconic Yggdrasil World Tree (matching reference proportion) -->
     <div class="hidden md:block relative max-w-[980px] mx-auto reveal">
-      <div class="relative w-full aspect-[25/18] select-none">
+      <div class="relative w-full aspect-[25/18] select-none overflow-visible">
+        <!-- Real-Time Orbital Sun (05:30 - 18:00, Monochrome Theme) -->
+        <div
+          id="ygg-celestial-sun"
+          class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 z-0 opacity-0 transition-opacity duration-1000"
+          style="left: 50%; top: 10%;"
+          aria-hidden="true"
+        >
+          <div id="ygg-sun-aura" class="relative w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
+            <span class="pointer-events-none absolute -inset-1.5 rounded-full border border-[#a3a3a3]/25"></span>
+            <span class="ygg-sun-rays absolute inset-0 rounded-full border border-dashed border-[#e5e5e5]/50"></span>
+            <span class="ygg-sun-core w-9 h-9 lg:w-11 lg:h-11 rounded-full border border-[#ffffff] bg-gradient-to-br from-[#ffffff] via-[#f5f5f5] to-[#d4d4d4] shadow-[0_0_38px_rgba(255,255,255,0.5)]"></span>
+          </div>
+        </div>
+
+        <!-- Real-Time Orbital Moon (18:00 - 05:30, Monochrome Theme) -->
+        <div
+          id="ygg-celestial-moon"
+          class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 z-0 opacity-0 transition-opacity duration-1000"
+          style="left: 50%; top: 10%;"
+          aria-hidden="true"
+        >
+          <div class="relative w-14 h-14 lg:w-16 lg:h-16 flex items-center justify-center">
+            <span class="absolute -inset-2 rounded-full bg-[#e5e5e5]/10 blur-md"></span>
+            <div class="relative w-9 h-9 lg:w-11 lg:h-11 rounded-full border border-[#a3a3a3]/55 bg-gradient-to-br from-[#e5e5e5] via-[#a3a3a3] to-[#262626] shadow-[0_0_30px_rgba(229,229,229,0.22)] overflow-hidden">
+              <span class="absolute top-2 left-2 w-2 h-2 rounded-full bg-[#171717]/40"></span>
+              <span class="absolute bottom-2.5 right-2 w-2.5 h-2.5 rounded-full bg-[#171717]/45"></span>
+              <span class="absolute top-5 right-3 w-1.5 h-1.5 rounded-full bg-[#262626]/35"></span>
+            </div>
+          </div>
+        </div>
+
         <!-- SVG World Tree Illustration -->
         <svg
-          class="absolute inset-0 w-full h-full pointer-events-none"
+          class="relative z-10 w-full h-full pointer-events-none"
           viewBox="0 0 1000 720"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden="true"
         >
           <defs>
-            <!-- Ambient cosmic halo behind crown & trunk -->
-            <radialGradient id="ygg-cosmos" cx="50%" cy="46%" r="52%">
+            <!-- Ambient cosmic halo behind crown & trunk (contained safely inside ellipse to avoid edge clipping) -->
+            <radialGradient id="ygg-cosmos" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stop-color="#ffffff" stop-opacity="0.09" />
-              <stop offset="48%" stop-color="#737373" stop-opacity="0.03" />
+              <stop offset="55%" stop-color="#737373" stop-opacity="0.03" />
               <stop offset="100%" stop-color="#0a0a0a" stop-opacity="0" />
             </radialGradient>
 
@@ -207,6 +391,14 @@ const asgardCitadelPath =
               <stop offset="100%" stop-color="#262626" stop-opacity="0.08" />
             </linearGradient>
 
+            <!-- Wind gust stream gradient -->
+            <linearGradient id="ygg-wind-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#a3a3a3" stop-opacity="0" />
+              <stop offset="35%" stop-color="#e5e5e5" stop-opacity="0.38" />
+              <stop offset="68%" stop-color="#ffffff" stop-opacity="0.58" />
+              <stop offset="100%" stop-color="#a3a3a3" stop-opacity="0" />
+            </linearGradient>
+
             <!-- Soft glow for conduits -->
             <filter id="ygg-soft-glow" x="-25%" y="-25%" width="150%" height="150%">
               <feGaussianBlur stdDeviation="3.5" result="blur" />
@@ -217,8 +409,8 @@ const asgardCitadelPath =
             </filter>
           </defs>
 
-          <!-- Atmospheric Radial Cosmic Nebula -->
-          <rect width="1000" height="720" fill="url(#ygg-cosmos)" />
+          <!-- Atmospheric Radial Cosmic Nebula (fades completely before SVG left/right edges) -->
+          <ellipse cx="500" cy="350" rx="430" ry="300" fill="url(#ygg-cosmos)" />
 
           <!-- Subtle Geometric Runic Halo behind Yggdrasil Heart -->
           <g opacity="0.18" stroke="#525252" stroke-width="1">
@@ -228,8 +420,8 @@ const asgardCitadelPath =
             <line x1="205" y1="395" x2="795" y2="395" stroke-opacity="0.35" stroke-dasharray="2 8" />
           </g>
 
-          <!-- Delicate Starlight Motes Around Canopy & Roots -->
-          <g fill="#e5e5e5" opacity="0.55">
+          <!-- Delicate Starlight Motes Around Canopy & Roots (Bright at Night, Faded in Day) -->
+          <g id="ygg-stars-group" fill="#e5e5e5" opacity="0.55" style="transition: opacity 0.9s ease;">
             <circle cx="205" cy="96" r="1.4" />
             <circle cx="268" cy="52" r="1.1" />
             <circle cx="380" cy="24" r="1.6" />
@@ -252,47 +444,55 @@ const asgardCitadelPath =
               stroke-width="1.4"
             />
 
-            <!-- Mid Canopy Leaf Billows -->
-            <path
-              d="M235,214
-                 C202,204 192,168 220,146
-                 C214,116 248,92 286,98
-                 C306,68 356,56 392,72
-                 C424,44 478,42 512,58
-                 C552,38 610,48 634,76
-                 C678,66 724,84 740,116
-                 C778,120 794,162 766,188
-                 C770,214 736,228 702,216
-                 C650,228 572,218 500,224
-                 C426,218 348,228 296,216
-                 C268,226 248,222 235,214 Z"
-              fill="url(#ygg-canopy-mid)"
-              stroke="#484848"
-              stroke-width="1.2"
-            />
+            <!-- Mid Canopy Leaf Billows & Silver Highlights Swaying in Wind -->
+            <g class="ygg-canopy-breeze">
+              <path
+                d="M235,214
+                   C202,204 192,168 220,146
+                   C214,116 248,92 286,98
+                   C306,68 356,56 392,72
+                   C424,44 478,42 512,58
+                   C552,38 610,48 634,76
+                   C678,66 724,84 740,116
+                   C778,120 794,162 766,188
+                   C770,214 736,228 702,216
+                   C650,228 572,218 500,224
+                   C426,218 348,228 296,216
+                   C268,226 248,222 235,214 Z"
+                fill="url(#ygg-canopy-mid)"
+                stroke="#484848"
+                stroke-width="1.2"
+              />
 
-            <!-- Upper Moonlight Silver-Lit Leaf Ridges -->
-            <path
-              d="M258,150
-                 C244,120 278,94 316,96
-                 C344,64 398,56 436,72
-                 C472,42 536,42 572,68
-                 C614,54 666,68 690,100
-                 C726,96 756,124 748,154"
-              stroke="url(#ygg-canopy-rim)"
-              stroke-width="2.4"
-              stroke-linecap="round"
-            />
-            <!-- Inner Canopy Scalloped Foliage Highlights -->
-            <g stroke="#737373" stroke-opacity="0.55" stroke-width="1.3" stroke-linecap="round">
-              <path d="M294,124 C318,108 352,110 374,126" />
-              <path d="M398,102 C432,84 474,84 504,104" />
-              <path d="M524,100 C556,82 602,86 632,106" />
-              <path d="M642,130 C674,116 708,124 726,144" />
-              <path d="M244,182 C272,166 308,170 332,188" />
-              <path d="M364,154 C402,138 446,140 478,158" />
-              <path d="M518,156 C558,138 604,142 636,162" />
-              <path d="M666,184 C696,170 728,174 750,192" />
+              <!-- Upper Moonlight Silver-Lit Leaf Ridges -->
+              <path
+                d="M258,150
+                   C244,120 278,94 316,96
+                   C344,64 398,56 436,72
+                   C472,42 536,42 572,68
+                   C614,54 666,68 690,100
+                   C726,96 756,124 748,154"
+                stroke="url(#ygg-canopy-rim)"
+                stroke-width="2.4"
+                stroke-linecap="round"
+              />
+              <!-- Inner Canopy Scalloped Foliage Highlights -->
+              <g stroke="#737373" stroke-opacity="0.55" stroke-width="1.3" stroke-linecap="round">
+                <path d="M294,124 C318,108 352,110 374,126" />
+                <path d="M398,102 C432,84 474,84 504,104" />
+                <path d="M524,100 C556,82 602,86 632,106" />
+                <path d="M642,130 C674,116 708,124 726,144" />
+                <path d="M244,182 C272,166 308,170 332,188" />
+                <path d="M364,154 C402,138 446,140 478,158" />
+                <path d="M518,156 C558,138 604,142 636,162" />
+                <path d="M666,184 C696,170 728,174 750,192" />
+              </g>
+              <!-- Outer Canopy Perimeter Rustling Leaf Sprigs -->
+              <g fill="#262626" stroke="#737373" stroke-width="0.95">
+                {canopyLeafSprigs.map((sprig) => (
+                  <path d={sprig.d} class="ygg-leaf-flutter" style={`animation-delay: ${sprig.delay};`} />
+                ))}
+              </g>
             </g>
           </g>
 
@@ -380,10 +580,34 @@ const asgardCitadelPath =
               <path d="M498,392 C492,414 494,436 502,448 C508,434 508,410 498,392" stroke-width="2" />
             </g>
 
-            <!-- Delicate Foliage Tufts on Left/Right Boughs Blending Tree Texture -->
+            <!-- Delicate Foliage Tufts on Left/Right Boughs Swaying with Breeze -->
             <g fill="#1c1c1c" stroke="#484848" stroke-width="1">
-              <path d="M188,338 C180,324 196,312 212,318 C222,306 244,312 242,328 C252,334 242,346 226,344 C210,348 194,346 188,338 Z" />
-              <path d="M812,338 C820,324 804,312 788,318 C778,306 756,312 758,328 C748,334 758,346 774,344 C790,348 806,346 812,338 Z" />
+              <g class="ygg-leaf-tuft-left">
+                <path d="M188,338 C180,324 196,312 212,318 C222,306 244,312 242,328 C252,334 242,346 226,344 C210,348 194,346 188,338 Z" />
+              </g>
+              <g class="ygg-leaf-tuft-right">
+                <path d="M812,338 C820,324 804,312 788,318 C778,306 756,312 758,328 C748,334 758,346 774,344 C790,348 806,346 812,338 Z" />
+              </g>
+            </g>
+
+            <!-- Small Leafy Mid-Trunk Branches Filling Mid-Tree Negative Space -->
+            <g id="ygg-mid-branches">
+              {midBranches.map((branch) => (
+                <g
+                  class={branch.side === 'left' ? 'ygg-mid-branch-left' : 'ygg-mid-branch-right'}
+                  style={`animation-delay: ${branch.delay};`}
+                >
+                  <path d={branch.branchPath} stroke="#222222" stroke-width={branch.width} stroke-linecap="round" fill="none" />
+                  <path d={branch.twigPath} stroke="#282828" stroke-width="2.4" stroke-linecap="round" fill="none" />
+                  <path d={branch.veinPath} stroke="url(#ygg-sap)" stroke-width="1.15" stroke-opacity="0.62" stroke-linecap="round" fill="none" />
+                  <g class="ygg-leaf-flutter" style={`animation-delay: ${branch.delay};`}>
+                    <path d={branch.clusterPath} fill="#1d1d1d" stroke="#525252" stroke-width="1.15" />
+                    {branch.leaves.map((leafPath) => (
+                      <path d={leafPath} fill="#262626" stroke="#737373" stroke-width="0.9" />
+                    ))}
+                  </g>
+                </g>
+              ))}
             </g>
 
             <!-- Asgard-Style Sanctuary Foundation Plateau ("Pondasi") Beneath EXP-01 (SMK Madinatul Quran) -->
@@ -451,6 +675,7 @@ const asgardCitadelPath =
             <path d="M440,524 C396,542 358,552 320,558" />
             <path d="M560,524 C604,542 642,552 680,558" />
           </g>
+
         </svg>
 
         <!-- 5 Interactive Realm Orbs + Heraldic Swallowtail Flags -->
@@ -473,11 +698,9 @@ const asgardCitadelPath =
                 data-realm-trigger={idx}
                 aria-label={`${item.code}: ${item.title}`}
               >
-                <!-- Banner Ribbon -->
+                <!-- Career Box with Subtle Rounded Corners -->
                 <div
-                  class={`ygg-banner spotlight-card relative w-[182px] lg:w-[228px] px-3 py-1.5 lg:px-3.5 lg:py-2 border border-[#3a3a3a] bg-[#111111]/95 backdrop-blur-sm transition-transform duration-300 group-hover:-translate-y-0.5 ${
-                    isLeftBanner ? 'ygg-swallowtail-left pl-6 pr-3' : 'ygg-swallowtail-right pr-6 pl-3'
-                  }`}
+                  class="ygg-banner spotlight-card relative w-[182px] lg:w-[228px] rounded-md px-3.5 py-2 border border-[#3a3a3a] bg-[#111111]/95 backdrop-blur-sm transition-transform duration-300 group-hover:-translate-y-0.5"
                 >
                   <div class={`flex items-center gap-1.5 text-[9px] font-mono tracking-wider text-[#a3a3a3] uppercase ${isLeftBanner ? 'justify-end' : 'justify-start'}`}>
                     <span class="text-[#e5e5e5] font-semibold">{item.code}</span>
@@ -492,7 +715,7 @@ const asgardCitadelPath =
                   </div>
                 </div>
 
-                <!-- Vertical Flagstaff Connecting Banner to Realm Orb -->
+                <!-- Vertical Staff Connecting Career Box to Realm Orb -->
                 <span class="block w-[1.5px] h-3.5 bg-gradient-to-b from-[#d4d4d4] to-[#525252]"></span>
               </button>
 
@@ -510,7 +733,7 @@ const asgardCitadelPath =
                 <!-- Milestone SVG Icon -->
                 <span class="relative z-10 flex items-center justify-center" set:html={item.icon} />
                 <!-- Mini Realm Code Tag Below Orb -->
-                <span class="ygg-orb-tag absolute -bottom-2.5 px-1.5 py-[1px] text-[8px] font-mono font-bold tracking-widest bg-[#0a0a0a] border border-[#3a3a3a] text-[#a3a3a3]">
+                <span class="ygg-orb-tag absolute -bottom-2.5 px-1.5 py-[1px] rounded-sm text-[8px] font-mono font-bold tracking-widest bg-[#0a0a0a] border border-[#3a3a3a] text-[#a3a3a3]">
                   {item.code}
                 </span>
               </button>
@@ -522,7 +745,7 @@ const asgardCitadelPath =
       <!-- Interactive Journey Chronicle Detail Bar (directly beneath roots) -->
       <div
         id="ygg-chronicle-card"
-        class="spotlight-card relative max-w-3xl mx-auto mt-3 p-5 border border-[#262626] bg-[#111111]/95 backdrop-blur-sm transition-colors duration-300"
+        class="spotlight-card relative max-w-3xl mx-auto mt-3 p-5 rounded-md border border-[#262626] bg-[#111111]/95 backdrop-blur-sm transition-colors duration-300"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="flex items-start gap-4 min-w-0">
@@ -556,7 +779,7 @@ const asgardCitadelPath =
             {timeline.map((item, idx) => (
               <button
                 type="button"
-                class={`ygg-step-pill px-2.5 py-1 text-[10px] font-mono border transition-colors duration-200 ${
+                class={`ygg-step-pill px-2.5 py-1 rounded-sm text-[10px] font-mono border transition-colors duration-200 ${
                   idx === 0
                     ? 'is-active border-[#e5e5e5] bg-[#e5e5e5] text-[#0a0a0a] font-bold'
                     : 'border-[#262626] bg-[#0d0d0d] text-[#737373] hover:border-[#525252] hover:text-[#e5e5e5]'
@@ -575,12 +798,14 @@ const asgardCitadelPath =
     <div class="md:hidden space-y-4 reveal">
       <div class="max-w-[300px] mx-auto opacity-85 pointer-events-none select-none">
         <svg viewBox="0 0 1000 720" class="w-full h-auto" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path
-            d={canopyBackPath}
-            fill="#171717"
-            stroke="#404040"
-            stroke-width="2"
-          />
+          <g class="ygg-canopy-breeze">
+            <path
+              d={canopyBackPath}
+              fill="#171717"
+              stroke="#404040"
+              stroke-width="2"
+            />
+          </g>
           <path
             d={unifiedWoodPath}
             fill="#141414"
@@ -588,6 +813,12 @@ const asgardCitadelPath =
             stroke-width="2"
             stroke-linejoin="round"
           />
+          {midBranches.map((branch) => (
+            <g class={branch.side === 'left' ? 'ygg-mid-branch-left' : 'ygg-mid-branch-right'} style={`animation-delay: ${branch.delay};`}>
+              <path d={branch.branchPath} stroke="#262626" stroke-width={branch.width} stroke-linecap="round" fill="none" />
+              <path d={branch.clusterPath} fill="#1b1b1b" stroke="#525252" stroke-width="1.3" />
+            </g>
+          ))}
           <path
             d={asgardCitadelPath}
             fill="#1c1c1c"
@@ -607,7 +838,7 @@ const asgardCitadelPath =
 
       <div class="space-y-3">
         {timeline.map((item) => (
-          <article class="spotlight-card p-4 border border-[#262626] bg-[#111111]/95 flex items-start gap-3.5">
+          <article class="spotlight-card p-4 rounded-md border border-[#262626] bg-[#111111]/95 flex items-start gap-3.5">
             <div class="shrink-0 w-11 h-11 rounded-full border border-[#404040] bg-[#181818] flex items-center justify-center shadow-[0_0_12px_rgba(255,255,255,0.08)]" set:html={item.icon} />
             <div class="min-w-0">
               <div class="flex flex-wrap items-center gap-1.5 text-[10px] font-mono text-[#a3a3a3] uppercase tracking-wider">
@@ -678,6 +909,54 @@ const asgardCitadelPath =
       });
     }
   </script>
+
+  <!-- Scoped Real-Time Sun/Moon Sky Cycle Controller for Yggdrasil -->
+  <script>
+    import { subscribeSkyCycle, getOrbitalPercent } from '../lib/skyCycle';
+
+    const yggSkyAtmos = document.getElementById('ygg-sky-atmosphere');
+    const yggSunEl = document.getElementById('ygg-celestial-sun');
+    const yggMoonEl = document.getElementById('ygg-celestial-moon');
+    const yggStarsEl = document.getElementById('ygg-stars-group');
+    const yggBadgeEl = document.getElementById('ygg-sky-badge');
+
+    subscribeSkyCycle((state) => {
+      if (yggStarsEl) {
+        yggStarsEl.setAttribute('opacity', state.starOpacity.toFixed(2));
+      }
+      if (yggBadgeEl) {
+        const iconChar = state.isDay ? '☀' : '☾';
+        yggBadgeEl.textContent = `[ ${iconChar} ${state.timeLabel} // ${state.phaseLabel} ]`;
+      }
+
+      const arc = getOrbitalPercent(state.progress, 10, 90, 8, 44);
+      if (yggSkyAtmos) {
+        const glowX = (50 + (arc.xPercent - 50) * 0.66).toFixed(1);
+        const glowY = (arc.yPercent + 10).toFixed(1);
+        const glowAlpha = state.isDay ? '0.13' : '0.09';
+        yggSkyAtmos.style.background = `radial-gradient(circle 360px at ${glowX}% ${glowY}%, rgba(229, 229, 229, ${glowAlpha}) 0%, rgba(10, 10, 10, 0) 100%)`;
+      }
+      if (yggSunEl) {
+        yggSunEl.style.left = `${arc.xPercent.toFixed(2)}%`;
+        yggSunEl.style.top = `${arc.yPercent.toFixed(2)}%`;
+        yggSunEl.style.opacity = state.isDay ? '1' : '0';
+        const sunCore = yggSunEl.querySelector('.ygg-sun-core') as HTMLElement | null;
+        if (sunCore) {
+          if (state.sunWarmth > 0.6) {
+            sunCore.style.boxShadow = '0 0 36px rgba(212, 212, 212, 0.42), 0 0 16px rgba(229, 229, 229, 0.55)';
+          } else {
+            sunCore.style.boxShadow = '0 0 44px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.75)';
+          }
+        }
+      }
+
+      if (yggMoonEl) {
+        yggMoonEl.style.left = `${arc.xPercent.toFixed(2)}%`;
+        yggMoonEl.style.top = `${arc.yPercent.toFixed(2)}%`;
+        yggMoonEl.style.opacity = state.isDay ? '0' : '1';
+      }
+    });
+  </script>
 </section>
 
 <style>
@@ -690,17 +969,235 @@ const asgardCitadelPath =
     }
   }
 
-  .ygg-swallowtail-left {
-    clip-path: polygon(16px 0%, 100% 0%, 100% 100%, 16px 100%, 0% 50%);
+  @keyframes yggCanopyBreeze {
+    0%,
+    100% {
+      transform: translate3d(0px, 0px, 0) rotate(0deg);
+    }
+    35% {
+      transform: translate3d(5px, -1.5px, 0) rotate(0.9deg);
+    }
+    68% {
+      transform: translate3d(2px, 0.5px, 0) rotate(0.35deg);
+    }
   }
 
-  .ygg-swallowtail-right {
-    clip-path: polygon(0% 0%, calc(100% - 16px) 0%, 100% 50%, calc(100% - 16px) 100%, 0% 100%);
+  @keyframes yggBranchSwayLeft {
+    0%,
+    100% {
+      transform: translate3d(0px, 0px, 0) rotate(0deg);
+    }
+    30% {
+      transform: translate3d(-1.5px, 0.5px, 0) rotate(-1.2deg);
+    }
+    65% {
+      transform: translate3d(4px, -1.5px, 0) rotate(2.9deg);
+    }
+  }
+
+  @keyframes yggBranchSwayRight {
+    0%,
+    100% {
+      transform: translate3d(0px, 0px, 0) rotate(0deg);
+    }
+    30% {
+      transform: translate3d(-1px, 0.5px, 0) rotate(-1deg);
+    }
+    65% {
+      transform: translate3d(4.5px, -1.5px, 0) rotate(3.4deg);
+    }
+  }
+
+  @keyframes yggLeafFlutter {
+    0%,
+    100% {
+      transform: translate3d(0px, 0px, 0) rotate(0deg);
+    }
+    28% {
+      transform: translate3d(-1.5px, 1px, 0) rotate(-3.5deg);
+    }
+    62% {
+      transform: translate3d(4px, -2px, 0) rotate(6.2deg);
+    }
+  }
+
+  @keyframes yggBreezeStream {
+    0% {
+      stroke-dashoffset: 180;
+      opacity: 0;
+    }
+    8% {
+      opacity: var(--wisp-opacity, 0.34);
+    }
+    90% {
+      opacity: var(--wisp-opacity, 0.34);
+    }
+    100% {
+      stroke-dashoffset: -1060;
+      opacity: 0;
+    }
+  }
+
+  @keyframes yggLeafDrift {
+    0% {
+      transform: translate3d(-40px, var(--leaf-y, 260px), 0) rotate(-18deg) scale(var(--leaf-scale, 0.9));
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.78;
+    }
+    38% {
+      transform: translate3d(440px, calc(var(--leaf-y, 260px) - 24px), 0) rotate(58deg) scale(var(--leaf-scale, 0.9));
+      opacity: 0.75;
+    }
+    70% {
+      transform: translate3d(980px, calc(var(--leaf-y, 260px) + 22px), 0) rotate(142deg) scale(var(--leaf-scale, 0.9));
+      opacity: 0.72;
+    }
+    92% {
+      opacity: 0.65;
+    }
+    100% {
+      transform: translate3d(1540px, calc(var(--leaf-y, 260px) - 10px), 0) rotate(220deg) scale(var(--leaf-scale, 0.9));
+      opacity: 0;
+    }
+  }
+
+  @keyframes yggBirdFlight {
+    0% {
+      transform: translate3d(-70px, calc(var(--bird-y, 90px) + 18px), 0) scale(var(--bird-scale, 0.85));
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.92;
+    }
+    36% {
+      transform: translate3d(460px, calc(var(--bird-y, 90px) - 22px), 0) scale(var(--bird-scale, 0.85));
+      opacity: 0.95;
+    }
+    68% {
+      transform: translate3d(1020px, calc(var(--bird-y, 90px) + 12px), 0) scale(var(--bird-scale, 0.85));
+      opacity: 0.92;
+    }
+    90% {
+      opacity: 0.88;
+    }
+    100% {
+      transform: translate3d(1550px, calc(var(--bird-y, 90px) - 20px), 0) scale(var(--bird-scale, 0.85));
+      opacity: 0;
+    }
+  }
+
+  @keyframes yggBirdWingFlap {
+    0%,
+    100% {
+      transform: scaleY(1) translateY(0px);
+    }
+    50% {
+      transform: scaleY(-0.55) translateY(1.5px);
+    }
+  }
+
+  .ygg-canopy-breeze {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation: yggCanopyBreeze 5.2s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .ygg-mid-branch-left {
+    transform-box: fill-box;
+    transform-origin: right center;
+    animation: yggBranchSwayLeft 4.8s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .ygg-mid-branch-right {
+    transform-box: fill-box;
+    transform-origin: left center;
+    animation: yggBranchSwayRight 4.8s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .ygg-leaf-tuft-left {
+    transform-box: fill-box;
+    transform-origin: right center;
+    animation: yggBranchSwayLeft 4.4s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .ygg-leaf-tuft-right {
+    transform-box: fill-box;
+    transform-origin: left center;
+    animation: yggBranchSwayRight 4.4s ease-in-out 0.55s infinite;
+    will-change: transform;
+  }
+
+  .ygg-leaf-flutter {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: yggLeafFlutter 3.6s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .ygg-breeze-ribbon {
+    stroke-dasharray: 165 1100;
+    animation-name: yggBreezeStream;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: stroke-dashoffset, opacity;
+  }
+
+  .ygg-drifting-leaf {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation-name: yggLeafDrift;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform, opacity;
+  }
+
+  .ygg-bird-flight {
+    animation-name: yggBirdFlight;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform, opacity;
+  }
+
+  .ygg-bird-wing {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation-name: yggBirdWingFlap;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    will-change: transform;
+  }
+
+  .ygg-sun-rays {
+    animation: yggSpinSlow 24s linear infinite;
+    will-change: transform;
   }
 
   .ygg-orb-ring {
     animation: yggSpinSlow 18s linear infinite;
     will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ygg-canopy-breeze,
+    .ygg-mid-branch-left,
+    .ygg-mid-branch-right,
+    .ygg-leaf-tuft-left,
+    .ygg-leaf-tuft-right,
+    .ygg-leaf-flutter,
+    .ygg-breeze-ribbon,
+    .ygg-drifting-leaf,
+    .ygg-bird-flight,
+    .ygg-bird-wing,
+    .ygg-sun-rays,
+    .ygg-orb-ring {
+      animation: none;
+    }
   }
 
   .ygg-realm-node.is-active {
