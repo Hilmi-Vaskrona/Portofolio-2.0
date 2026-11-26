@@ -38,12 +38,6 @@ const rightBuildings = [
     id="night-city-scene"
     class="relative w-full h-48 sm:h-56 bg-gradient-to-b from-[#050505] via-[#0a0a0a] to-[#111111] overflow-hidden flex flex-col justify-end"
   >
-    <!-- Real-Time Sky Atmosphere Layer (Synced with Yggdrasil Section) -->
-    <div
-      id="city-sky-atmosphere"
-      class="pointer-events-none absolute inset-0 transition-all duration-1000"
-    ></div>
-
     <!-- Stars Layer -->
     <div id="city-stars" class="pointer-events-none absolute inset-0 opacity-70 transition-opacity duration-700">
       <span class="city-star absolute top-6 left-[12%] w-1 h-1 rounded-full bg-[#e5e5e5] animate-pulse"></span>
@@ -54,40 +48,11 @@ const rightBuildings = [
       <span class="city-star absolute top-12 left-[89%] w-1 h-1 rounded-full bg-[#a3a3a3] animate-ping" style="animation-duration: 4.2s;"></span>
     </div>
 
-    <!-- Real-Time Orbital Sun (05:30 - 18:00, Monochrome Theme) -->
-    <div
-      id="city-sun"
-      class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 opacity-0 transition-all duration-1000"
-      style="left: 50%; top: 20%;"
-      aria-hidden="true"
-    >
-      <div class="relative w-14 h-14 flex items-center justify-center">
-        <span class="pointer-events-none absolute -inset-1 rounded-full border border-[#a3a3a3]/25"></span>
-        <span class="city-sun-rays absolute inset-0 rounded-full border border-dashed border-[#e5e5e5]/50"></span>
-        <span class="city-sun-core w-9 h-9 rounded-full border border-[#ffffff] bg-gradient-to-br from-[#ffffff] via-[#f5f5f5] to-[#d4d4d4] shadow-[0_0_38px_rgba(255,255,255,0.5)]"></span>
-      </div>
-    </div>
-
-    <!-- Real-Time Orbital Cyber Moon (18:00 - 05:30, Monochrome Theme) -->
+    <!-- Cyber Moon -->
     <div
       id="city-moon"
-      class="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full border border-[#a3a3a3]/55 bg-gradient-to-br from-[#e5e5e5]/85 via-[#a3a3a3]/50 to-[#1f1f1f]/90 shadow-[0_0_32px_rgba(229,229,229,0.22)] overflow-hidden transition-all duration-1000"
-      style="left: 82%; top: 22%;"
-      aria-hidden="true"
-    >
-      <span class="absolute top-2.5 left-2.5 w-2 h-2 rounded-full bg-[#171717]/40"></span>
-      <span class="absolute bottom-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-[#171717]/45"></span>
-    </div>
-
-    <!-- Daytime City Silhouette Birds -->
-    <div id="city-day-birds" class="pointer-events-none absolute inset-0 overflow-hidden opacity-0 transition-opacity duration-700">
-      <svg class="city-bird city-bird-1 absolute top-8 w-5 h-3 text-[#d4d4d4]" viewBox="0 0 24 12" fill="none">
-        <path d="M2 7 Q7 2 12 6 Q17 2 22 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-      </svg>
-      <svg class="city-bird city-bird-2 absolute top-14 w-4 h-2.5 text-[#a3a3a3]" viewBox="0 0 24 12" fill="none">
-        <path d="M2 7 Q7 2 12 6 Q17 2 22 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
-      </svg>
-    </div>
+      class="pointer-events-none absolute top-7 right-10 sm:right-20 w-12 h-12 rounded-full border border-[#a3a3a3]/40 bg-gradient-to-br from-[#e5e5e5]/20 to-transparent shadow-[0_0_40px_rgba(229,229,229,0.18)] transition-all duration-700"
+    ></div>
 
     <!-- Interactive Cursor Searchlights -->
     <div
@@ -486,15 +451,8 @@ const rightBuildings = [
 </footer>
 
 <script>
-  import { subscribeSkyCycle, getOrbitalPercent } from '../lib/skyCycle';
-
   const footerRoot = document.getElementById('footer-root');
   const cityScene = document.getElementById('night-city-scene');
-  const citySkyAtmos = document.getElementById('city-sky-atmosphere');
-  const cityStars = document.getElementById('city-stars');
-  const citySun = document.getElementById('city-sun');
-  const cityMoon = document.getElementById('city-moon');
-  const cityDayBirds = document.getElementById('city-day-birds');
   const searchlight1 = document.getElementById('city-searchlight-1');
   const searchlight2 = document.getElementById('city-searchlight-2');
   const cityWindows = document.querySelectorAll('.city-window');
@@ -506,51 +464,6 @@ const rightBuildings = [
   const footerCenterSocials = document.getElementById('footer-center-socials');
 
   let isCityDestroyed = false;
-
-  // Synchronize Footer City Sun/Moon orbital cycle with real local time (same engine as Yggdrasil)
-  subscribeSkyCycle((state) => {
-    if (citySkyAtmos) {
-      citySkyAtmos.style.background = state.skyBackground;
-    }
-    if (cityStars) {
-      cityStars.style.opacity = state.starOpacity.toFixed(2);
-    }
-    if (cityDayBirds) {
-      cityDayBirds.style.opacity = state.isDay ? '0.65' : '0';
-    }
-
-    const arc = getOrbitalPercent(state.progress, 8, 92, 16, 72);
-    if (citySun) {
-      citySun.style.left = `${arc.xPercent.toFixed(2)}%`;
-      citySun.style.top = `${arc.yPercent.toFixed(2)}%`;
-      citySun.style.opacity = state.isDay ? '1' : '0';
-      const sunCore = citySun.querySelector('.city-sun-core') as HTMLElement | null;
-      if (sunCore) {
-        if (state.sunWarmth > 0.6) {
-          sunCore.style.boxShadow = '0 0 36px rgba(212, 212, 212, 0.42), 0 0 16px rgba(229, 229, 229, 0.55)';
-        } else {
-          sunCore.style.boxShadow = '0 0 44px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.75)';
-        }
-      }
-    }
-
-    if (cityMoon) {
-      cityMoon.style.left = `${arc.xPercent.toFixed(2)}%`;
-      cityMoon.style.top = `${arc.yPercent.toFixed(2)}%`;
-      cityMoon.style.opacity = state.isDay ? '0' : '1';
-    }
-
-    if (!isCityDestroyed) {
-      const beamOpacity = state.isDay ? '0.18' : '1';
-      if (searchlight1) searchlight1.style.opacity = beamOpacity;
-      if (searchlight2) searchlight2.style.opacity = beamOpacity;
-
-      if (cityStatusText) {
-        const prefix = state.isDay ? 'CITY SKYLINE' : 'NIGHT CITY';
-        cityStatusText.textContent = `${prefix} // SECTOR-09 — ${state.phaseLabel} (${state.timeLabel})`;
-      }
-    }
-  });
 
   // Interactive Night City: Hovering/Clicking windows & moving searchlights with cursor
   cityWindows.forEach((win) => {
@@ -634,47 +547,3 @@ const rightBuildings = [
     }
   });
 </script>
-
-<style>
-  @keyframes citySunSpin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  @keyframes cityBirdGlide {
-    0% {
-      transform: translate3d(-10vw, 4px, 0) scaleY(1);
-    }
-    25% {
-      transform: translate3d(25vw, -8px, 0) scaleY(0.55);
-    }
-    50% {
-      transform: translate3d(55vw, 2px, 0) scaleY(1);
-    }
-    75% {
-      transform: translate3d(85vw, -10px, 0) scaleY(0.55);
-    }
-    100% {
-      transform: translate3d(115vw, 0px, 0) scaleY(1);
-    }
-  }
-
-  .city-sun-rays {
-    animation: citySunSpin 24s linear infinite;
-    will-change: transform;
-  }
-
-  .city-bird-1 {
-    animation: cityBirdGlide 18s linear infinite;
-    will-change: transform;
-  }
-
-  .city-bird-2 {
-    animation: cityBirdGlide 22s linear -9s infinite;
-    will-change: transform;
-  }
-</style>
