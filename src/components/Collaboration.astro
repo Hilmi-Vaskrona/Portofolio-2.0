@@ -1,0 +1,395 @@
+---
+interface Collaborator {
+  username: string;
+  name: string;
+  avatar: string;
+  profileUrl: string;
+  role: string;
+  commits?: number;
+}
+
+interface CollabProject {
+  code: string;
+  year: string;
+  repoName: string;
+  repoFullName: string;
+  repoUrl: string;
+  title: string;
+  scope: string;
+  description: string;
+  tech: string[];
+  featured?: boolean;
+  collaborators: Collaborator[];
+}
+
+const collabProjects: CollabProject[] = [
+  {
+    code: 'CLB-01',
+    year: '2026',
+    repoName: 'vokasi_lp',
+    repoFullName: 'Hilmi-Vaskrona/vokasi_lp',
+    repoUrl: 'https://github.com/Hilmi-Vaskrona/vokasi_lp',
+    title: 'Vokasi Landing Page & Web Portal',
+    scope: 'Team Collaboration • 5 Contributors',
+    description:
+      'Kolaborasi tim membangun portal dan landing page interaktif berbasis React & TypeScript dengan animasi transisi modern, editor konten kaya (CKEditor), serta manajemen data asinkron menggunakan TanStack Query.',
+    tech: ['React', 'TypeScript', 'Tailwind CSS', 'GSAP', 'Framer Motion', 'TanStack Query'],
+    featured: true,
+    collaborators: [
+      {
+        username: 'Krunia101',
+        name: 'Karunia Ibrahim',
+        avatar: 'https://avatars.githubusercontent.com/u/149747893?v=4',
+        profileUrl: 'https://github.com/Krunia101',
+        role: 'Collaborator',
+        commits: 37,
+      },
+      {
+        username: 'sicoding1120',
+        name: 'Daffa Hafizh Firdaus',
+        avatar: 'https://avatars.githubusercontent.com/u/147905588?v=4',
+        profileUrl: 'https://github.com/sicoding1120',
+        role: 'Collaborator',
+        commits: 24,
+      },
+      {
+        username: 'ahfary',
+        name: 'Ahfary',
+        avatar: 'https://avatars.githubusercontent.com/u/145752722?v=4',
+        profileUrl: 'https://github.com/ahfary',
+        role: 'Collaborator',
+        commits: 7,
+      },
+      {
+        username: 'mhardiansyah',
+        name: 'M. Hardiansyah',
+        avatar: 'https://avatars.githubusercontent.com/u/149748253?v=4',
+        profileUrl: 'https://github.com/mhardiansyah',
+        role: 'Collaborator',
+        commits: 3,
+      },
+    ],
+  },
+  {
+    code: 'CLB-02',
+    year: '2026',
+    repoName: 'Frontend-Nusafone',
+    repoFullName: 'Hilmi-Vaskrona/Frontend-Nusafone',
+    repoUrl: 'https://github.com/Hilmi-Vaskrona/Frontend-Nusafone',
+    title: 'Nusafone Frontend Web Platform',
+    scope: 'Pair Collaboration • Frontend',
+    description:
+      'Pengembangan bersama antarmuka aplikasi web Nusafone menggunakan Next.js dan TypeScript, dilengkapi validasi form terstruktur (Zod + React Hook Form) serta state management ringan berbasis Zustand.',
+    tech: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Zustand', 'Zod'],
+    collaborators: [
+      {
+        username: 'Hamzahzahh09',
+        name: 'Hamzah Ahmad',
+        avatar: 'https://avatars.githubusercontent.com/u/186898142?v=4',
+        profileUrl: 'https://github.com/Hamzahzahh09',
+        role: 'Frontend Collaborator',
+        commits: 2,
+      },
+    ],
+  },
+  {
+    code: 'CLB-03',
+    year: '2025',
+    repoName: 'UAS-Collaborate',
+    repoFullName: 'Hilmi-Vaskrona/UAS-Collaborate',
+    repoUrl: 'https://github.com/Hilmi-Vaskrona/UAS-Collaborate',
+    title: 'Travel Project Collaboration',
+    scope: 'Pair Collaboration • Web App',
+    description:
+      'Proyek kolaborasi UAS membangun aplikasi web bertema travel & destinasi wisata yang responsif, cepat, dan interaktif menggunakan ekosistem Vue 3, Vue Router, Swiper, dan Tailwind CSS.',
+    tech: ['Vue 3', 'Vite', 'Vue Router', 'Tailwind CSS', 'Swiper'],
+    collaborators: [
+      {
+        username: 'fadlanmawardi',
+        name: 'M. Fadlan Mawardi',
+        avatar: 'https://avatars.githubusercontent.com/u/187168040?v=4',
+        profileUrl: 'https://github.com/fadlanmawardi',
+        role: 'Web Collaborator',
+        commits: 2,
+      },
+    ],
+  },
+  {
+    code: 'CLB-04',
+    year: '2026',
+    repoName: 'backend-v',
+    repoFullName: 'DilfuAltaf/backend-v',
+    repoUrl: 'https://github.com/DilfuAltaf/backend-v',
+    title: 'Modular NestJS REST API Backend',
+    scope: 'Cross-Repo Contribution • Backend',
+    description:
+      'Kontribusi kolaboratif lintas repositori pada pengembangan layanan backend RESTful API menggunakan NestJS, TypeORM, autentikasi JWT Passport, rate-limiting, serta dokumentasi endpoint Swagger.',
+    tech: ['NestJS', 'TypeScript', 'TypeORM', 'MySQL', 'JWT', 'Swagger'],
+    collaborators: [
+      {
+        username: 'DilfuAltaf',
+        name: 'Dilfu Altaf',
+        avatar: 'https://avatars.githubusercontent.com/u/187482236?v=4',
+        profileUrl: 'https://github.com/DilfuAltaf',
+        role: 'Repository Owner',
+        commits: 1,
+      },
+    ],
+  },
+  {
+    code: 'CLB-05',
+    year: '2026',
+    repoName: 'Project-TCG-Back-Up-an-Data-',
+    repoFullName: 'Affan953/Project-TCG-Back-Up-an-Data-',
+    repoUrl: 'https://github.com/Affan953/Project-TCG-Back-Up-an-Data-',
+    title: 'Trading Card Game (TCG) Mobile App',
+    scope: 'Cross-Repo Contribution • Mobile',
+    description:
+      'Kolaborasi pengembangan aplikasi mobile bertema Trading Card Game (TCG) lintas perangkat menggunakan Flutter dan Dart bersama rekan satu tim.',
+    tech: ['Flutter', 'Dart', 'Mobile UI'],
+    collaborators: [
+      {
+        username: 'Affan953',
+        name: 'Affan Abdullah',
+        avatar: 'https://avatars.githubusercontent.com/u/196159900?v=4',
+        profileUrl: 'https://github.com/Affan953',
+        role: 'Repository Owner',
+        commits: 3,
+      },
+    ],
+  },
+];
+
+// Deduplicated collaborator directory across all collaborative repositories
+const collaboratorRoster = Array.from(
+  new Map(
+    collabProjects.flatMap((project) =>
+      project.collaborators.map((person) => [
+        person.username,
+        {
+          ...person,
+          projectRepo: project.repoName,
+          projectUrl: project.repoUrl,
+        },
+      ])
+    )
+  ).values()
+);
+---
+
+<section id="collaboration" class="relative overflow-hidden">
+  <!-- Chanhdai Section Header Bar -->
+  <div class="border-b border-[#262626] px-6 py-3 flex items-center justify-between text-xs font-mono text-[#525252] bg-[#0a0a0a]">
+    <span>SEC // 05 &mdash; COLLABORATION</span>
+    <span>[ COLLAB_NETWORK.LOG ]</span>
+  </div>
+
+  <!-- JackieZhang Kinetic Scroll Marquee Background -->
+  <div class="pointer-events-none select-none overflow-hidden py-4 border-b border-[#262626]/60 bg-[#0d0d0d]">
+    <div
+      class="scroll-marquee-track whitespace-nowrap font-display text-3xl sm:text-5xl font-black tracking-widest text-[#1a1a1a] uppercase"
+      data-marquee-speed="-0.18"
+    >
+      <span>COLLABORATION EXPERIENCE &bull; TEAM SYNERGY &bull; GITHUB CONTRIBUTORS &bull; </span>
+      <span>COLLABORATION EXPERIENCE &bull; TEAM SYNERGY &bull; GITHUB CONTRIBUTORS &bull; </span>
+    </div>
+  </div>
+
+  <div class="p-6 lg:p-12 relative">
+    <span class="corner-plus -top-[5px] -left-[5px]"></span>
+    <span class="corner-plus -top-[5px] -right-[5px]"></span>
+
+    <!-- Section Title + Live GitHub Telemetry Summary -->
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10 reveal velocity-skew">
+      <div>
+        <p class="text-xs font-mono text-[#a3a3a3] tracking-[0.3em] uppercase mb-2">Teamwork &amp; Synergy</p>
+        <h2 class="text-4xl lg:text-5xl font-black text-[#e5e5e5]">
+          Collaboration <span class="text-[#a3a3a3]">Experience</span>
+        </h2>
+        <p class="text-sm text-[#a3a3a3] mt-3 max-w-2xl leading-relaxed">
+          Rekam jejak kolaborasi pengembangan perangkat lunak bersama rekan tim pada berbagai repositori GitHub &mdash; mulai dari portal web, aplikasi Vue &amp; Next.js, layanan REST API NestJS, hingga aplikasi mobile Flutter.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2.5 self-start lg:self-auto">
+        <div class="px-3.5 py-2 rounded-xl border border-[#262626] bg-[#111111]/80 font-mono text-xs text-[#a3a3a3] flex items-center gap-3">
+          <span class="flex items-center gap-1.5 text-[#e5e5e5] font-semibold">
+            <span class="w-2 h-2 rounded-full bg-[#e5e5e5] shadow-[0_0_8px_#e5e5e5]"></span>
+            {collabProjects.length} Shared Repos
+          </span>
+          <span class="text-[#3f3f46]">|</span>
+          <span>{collaboratorRoster.length} Collaborators</span>
+        </div>
+
+        <a
+          href="https://github.com/Hilmi-Vaskrona?tab=repositories"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-[#262626] bg-[#0f0f0f] hover:border-[#a3a3a3] hover:text-[#ffffff] text-xs font-mono text-[#d4d4d4] transition-colors duration-300"
+        >
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          <span>@Hilmi-Vaskrona</span>
+          <span class="text-[#737373]">&nearr;</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Collaborator Network Roster (All Verified GitHub Peers) -->
+    <div class="mb-10 border border-[#262626] rounded-2xl bg-[#0e0e0e]/90 overflow-hidden reveal velocity-skew">
+      <div class="px-5 py-3 border-b border-[#262626] bg-[#0a0a0a] flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-[#737373]">
+        <span class="uppercase tracking-wider text-[#a3a3a3]">GITHUB COLLABORATOR ROSTER // VERIFIED CONTRIBUTORS</span>
+        <span>CLICK PROFILE TO INSPECT GITHUB</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 bg-[#0a0a0a] -mr-px -mb-px">
+        {collaboratorRoster.map((person) => (
+          <a
+            href={person.profileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="spotlight-card group flex items-center gap-3.5 p-4 border-r border-b border-[#262626] bg-[#0e0e0e] hover:bg-[#151515] transition-colors duration-300"
+          >
+            <img
+              src={person.avatar}
+              alt={person.username}
+              loading="lazy"
+              width="42"
+              height="42"
+              class="w-10 h-10 rounded-full border border-[#333333] group-hover:border-[#e5e5e5] object-cover grayscale group-hover:grayscale-0 transition-all duration-300 shrink-0 bg-[#171717]"
+            />
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-1">
+                <p class="text-sm font-bold text-[#e5e5e5] group-hover:text-white truncate transition-colors">
+                  {person.name}
+                </p>
+                <span class="font-mono text-xs text-[#525252] group-hover:text-[#e5e5e5] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0">
+                  &nearr;
+                </span>
+              </div>
+              <p class="text-xs font-mono text-[#a3a3a3] truncate">@{person.username}</p>
+              <p class="text-[10px] font-mono text-[#525252] truncate mt-0.5">repo: {person.projectRepo}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <!-- Collaborative Projects Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {collabProjects.map((project, index) => (
+        <article
+          class={`spotlight-card group rounded-2xl border border-[#262626] bg-[#111111]/60 hover:border-[#a3a3a3]/50 p-6 lg:p-8 flex flex-col justify-between transition-all duration-300 reveal velocity-skew ${
+            project.featured ? 'md:col-span-2 bg-[#121212]/80' : ''
+          }`}
+          style={`--reveal-delay: ${(index % 3) * 80}ms;`}
+        >
+          <div>
+            <!-- Top Project Metadata Row -->
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-[11px] font-mono px-2.5 py-0.5 rounded bg-[#0a0a0a] border border-[#262626] text-[#e5e5e5] font-semibold">
+                  {project.code}
+                </span>
+                <span class="text-xs font-mono text-[#a3a3a3]">{project.year}</span>
+                <span class="text-[#3f3f46]">&bull;</span>
+                <span class="text-[11px] font-mono text-[#737373] uppercase tracking-wider">{project.scope}</span>
+              </div>
+
+              <a
+                href={project.repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0a0a0a] border border-[#262626] group-hover:border-[#a3a3a3]/70 text-xs font-mono text-[#d4d4d4] hover:text-white transition-colors"
+                title={`Buka repositori ${project.repoFullName} di GitHub`}
+              >
+                <svg class="w-3.5 h-3.5 fill-current text-[#a3a3a3]" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+                <span class="truncate max-w-[210px] sm:max-w-none">{project.repoFullName}</span>
+                <span class="text-[#737373]">&nearr;</span>
+              </a>
+            </div>
+
+            <!-- Project Title & Description -->
+            <h3 class="text-xl lg:text-2xl font-bold text-[#e5e5e5] group-hover:text-white transition-colors mb-2.5">
+              {project.title}
+            </h3>
+            <p class="text-sm text-[#a3a3a3] leading-relaxed mb-5 max-w-3xl">
+              {project.description}
+            </p>
+
+            <!-- Tech Stack Badges -->
+            <div class="flex flex-wrap gap-1.5 mb-6">
+              {project.tech.map((t) => (
+                <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-md bg-[#0a0a0a] text-[#a3a3a3] border border-[#262626]">
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <!-- Collaborators Footer Box -->
+          <div class="pt-4 border-t border-[#262626]/80">
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="text-[11px] font-mono uppercase tracking-wider text-[#737373]">
+                Collaborated With ({project.collaborators.length})
+              </span>
+              <div class="flex -space-x-2">
+                <img
+                  src="https://avatars.githubusercontent.com/u/188300908?v=4"
+                  alt="Hilmi-Vaskrona"
+                  title="Hilmi-Vaskrona (You)"
+                  loading="lazy"
+                  width="24"
+                  height="24"
+                  class="w-6 h-6 rounded-full border border-[#0a0a0a] ring-1 ring-[#3f3f46] object-cover grayscale"
+                />
+                {project.collaborators.map((c) => (
+                  <img
+                    src={c.avatar}
+                    alt={c.username}
+                    title={`@${c.username}`}
+                    loading="lazy"
+                    width="24"
+                    height="24"
+                    class="w-6 h-6 rounded-full border border-[#0a0a0a] ring-1 ring-[#3f3f46] object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              {project.collaborators.map((person) => (
+                <a
+                  href={person.profileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full bg-[#0a0a0a] border border-[#262626] hover:border-[#e5e5e5] hover:bg-[#171717] transition-all duration-200 group/chip"
+                >
+                  <img
+                    src={person.avatar}
+                    alt={person.username}
+                    loading="lazy"
+                    width="26"
+                    height="26"
+                    class="w-6 h-6 rounded-full object-cover border border-[#333333] grayscale group-hover/chip:grayscale-0 transition-all"
+                  />
+                  <div class="flex items-center gap-1.5 text-xs">
+                    <span class="font-semibold text-[#e5e5e5] group-hover/chip:text-white">
+                      {person.name}
+                    </span>
+                    <span class="font-mono text-[11px] text-[#737373] group-hover/chip:text-[#a3a3a3]">
+                      @{person.username}
+                    </span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
